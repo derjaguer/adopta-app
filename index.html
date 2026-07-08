@@ -3,28 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adopta App - Búsqueda de Mascotas</title>
-    <!-- Este script es el truco para usar Tailwind CSS sin instalar nada -->
+    <title>AdoptaPatitas</title>
+    <!-- Tailwind y Firebase -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
-<body class="bg-gray-100 min-h-screen font-sans text-gray-800">
+<body class="bg-gray-50 min-h-screen">
+    <div id="app" class="p-6">
+        <h1 class="text-3xl font-bold text-center text-orange-600">Bienvenido a AdoptaPatitas</h1>
+        <p class="text-center mt-4">Cargando sistema de adopción...</p>
+    </div>
 
-    <header class="bg-blue-600 text-white p-4 shadow-md">
-        <div class="max-w-4xl mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold">🐾 Adopta App</h1>
-            <p>Encuentra a tu mejor amigo</p>
-        </div>
-    </header>
+    <script>
+        // Configuración - Sustituye con tus credenciales de Firebase de la consola de Firebase
+        const firebaseConfig = {
+            apiKey: "TU_API_KEY",
+            authDomain: "TU_PROYECTO.firebaseapp.com",
+            projectId: "TU_PROYECTO",
+            storageBucket: "TU_PROYECTO.appspot.com",
+            messagingSenderId: "TU_ID",
+            appId: "TU_APP_ID"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
-    <main class="max-w-4xl mx-auto p-6 mt-6 bg-white rounded-lg shadow">
-        <h2 class="text-xl font-semibold mb-4">Mascotas Disponibles</h2>
-        <p class="mb-4">Aquí pronto aparecerá la lista de mascotas usando Firebase...</p>
-        
-        <!-- Botón de prueba -->
-        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-            Reportar Mascota
-        </button>
-    </main>
-
+        // Lógica básica para mostrar la interfaz
+        document.getElementById('app').innerHTML = `
+            <div class="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-md">
+                <h2 class="text-2xl font-bold mb-4">Catálogo de Mascotas</h2>
+                <p>El sistema está listo. Por favor, asegúrate de configurar tu `firebaseConfig` arriba con los datos de tu proyecto real en Firebase para que los datos aparezcan.</p>
+            </div>
+        `;
+    </script>
 </body>
 </html>
