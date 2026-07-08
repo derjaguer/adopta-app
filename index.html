@@ -19,14 +19,14 @@
     <script>
         // Configuración - Sustituye con tus credenciales de Firebase de la consola de Firebase
         const firebaseConfig = {
-            apiKey: "AIzaSyDkeh5WVeWi1yFTHGiCSLvz9aB8auhZtT8",
-            authDomain: "buscapatutas.firebaseapp.com",
-            projectId: "buscapatutas",
-            storageBucket: "buscapatutas.firebasestorage.app",
-            messagingSenderId: "61106039176",
-            appId: "1:61106039176:web:266707c6c9fa2c5a1b723d"
-            measurementId: "G-NS2EZKX6KN"
-        };
+    apiKey: "AIzaSyDkeh5WVeWi1yFTHGiCSLvz9aB8auhZtT8",
+    authDomain: "buscapatutas.firebaseapp.com",
+    projectId: "buscapatutas",
+    storageBucket: "buscapatutas.firebasestorage.app",
+    messagingSenderId: "61106039176",
+    appId: "1:61106039176:web:266707c6c9fa2c5a1b723d", // <--- Faltaba esta coma
+    measurementId: "G-NS2EZKX6KN"
+};
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
