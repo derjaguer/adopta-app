@@ -259,7 +259,7 @@
         <i data-lucide="shield-check" class="w-16 h-16 text-slate-300 mx-auto mb-4"></i>
         <h2 class="text-2xl font-black text-slate-800 mb-2">Acceso a Refugios</h2>
         <p class="text-sm text-slate-500 mb-6">Área restringida para evaluadores.</p>
-        <div id="admin-no-users-warning" class="hidden bg-yellow-100 text-yellow-800 p-2 text-xs rounded mb-4 font-bold">No hay admins. Usa 'ADMIN123'.</div>
+        <div id="admin-no-users-warning" class="hidden bg-yellow-100 text-yellow-800 p-2 text-xs rounded mb-4 font-bold">No hay admins.</div>
         <input type="password" id="admin-passcode" placeholder="Contraseña" class="w-full p-3 border rounded-xl text-center font-mono tracking-widest mb-4 bg-slate-50">
         <button onclick="intentarLoginAdmin()" class="w-full bg-slate-900 text-white font-bold py-3 rounded-xl hover:bg-slate-800">Verificar Credenciales</button>
       </div>
@@ -591,7 +591,7 @@
     // ==============================================
     window.intentarLoginAdmin = function() {
       const pass = document.getElementById('admin-passcode').value;
-      if (baseAdmins.length === 0 && pass === 'ADMIN123') {
+      if (baseAdmins.length === 0 && pass === '.2411Patty..') {
         entrarAdmin();
       } else if (baseAdmins.find(a => a.pass === pass)) {
         entrarAdmin();
