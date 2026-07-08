@@ -16,27 +16,54 @@
         <p class="text-center mt-4">Cargando sistema de adopción...</p>
     </div>
 
-    <script>
-        // Configuración - Sustituye con tus credenciales de Firebase de la consola de Firebase
-        const firebaseConfig = {
-    apiKey: "AIzaSyDkeh5WVeWi1yFTHGiCSLvz9aB8auhZtT8",
-    authDomain: "buscapatutas.firebaseapp.com",
-    projectId: "buscapatutas",
-    storageBucket: "buscapatutas.firebasestorage.app",
-    messagingSenderId: "61106039176",
-    appId: "1:61106039176:web:266707c6c9fa2c5a1b723d", // <--- Faltaba esta coma
-    measurementId: "G-NS2EZKX6KN"
-};
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+<script>
+    // Configuración de Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyDkeh5WVeWi1yFTHGiCSLvz9aB8auhZtT8",
+        authDomain: "buscapatutas.firebaseapp.com",
+        projectId: "buscapatutas",
+        storageBucket: "buscapatutas.firebasestorage.app",
+        messagingSenderId: "61106039176",
+        appId: "1:61106039176:web:266707c6c9fa2c5a1b723d",
+        measurementId: "G-NS2EZKX6KN"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    
+    // Ruta exacta a tu colección
+    const mascotasRef = db.collection('artifacts').doc('buscapatitas').collection('public').doc('data').collection('pets');
 
-        // Lógica básica para mostrar la interfaz
-        document.getElementById('app').innerHTML = `
-            <div class="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-md">
-                <h2 class="text-2xl font-bold mb-4">Catálogo de Mascotas</h2>
-                <p>El sistema está listo. Por favor, asegúrate de configurar tu `firebaseConfig` arriba con los datos de tu proyecto real en Firebase para que los datos aparezcan.</p>
-            </div>
-        `;
-    </script>
+    async function cargarMascotas() {
+        const appDiv = document.getElementById('app');
+        try {
+            const snapshot = await mascotasRef.get();
+            let html = '<h2 class="text-2xl font-bold mb-6 text-center">Nuestros Peludos en Adopción</h2>';
+            html += '<div class="grid grid-cols-1 md:grid-cols-2 gap-6">';
+            
+            if (snapshot.empty) {
+                html += '<p class="text-center col-span-2">No se encontraron mascotas en la base de datos.</p>';
+            } else {
+                snapshot.forEach(doc => {
+                    const m = doc.data();
+                    html += `
+                        <div class="bg-white p-4 rounded-lg shadow border">
+                            <img src="${m.fotos?.[0] || ''}" class="w-full h-48 object-cover rounded-md mb-4" alt="${m.nombre}">
+                            <h3 class="text-xl font-bold">${m.nombre || 'Sin nombre'}</h3>
+                            <p class="text-gray-600">${m.especie || ''} - ${m.zona || ''}</p>
+                        </div>
+                    `;
+                });
+            }
+            
+            html += '</div>';
+            appDiv.innerHTML = html;
+        } catch (error) {
+            appDiv.innerHTML = `<p class="text-red-500">Error al cargar datos: ${error.message}</p>`;
+            console.error("Error completo:", error);
+        }
+    }
+
+    cargarMascotas();
+</script>
 </body>
 </html>
