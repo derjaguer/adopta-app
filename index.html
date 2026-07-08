@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AdoptaPatitas</title>
-    <!-- Tailwind y Firebase -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -17,36 +16,41 @@
     </div>
 
 <script>
-    // Configuración (ya la tienes, solo asegúrate de que esté completa)
-    const firebaseConfig = { /* ... tus datos ... */ };
+    const firebaseConfig = {
+        apiKey: "AIzaSyDkeh5WVeWi1yFTHGiCSLvz9aB8auhZtT8",
+        authDomain: "buscapatutas.firebaseapp.com",
+        projectId: "buscapatutas",
+        storageBucket: "buscapatutas.firebasestorage.app",
+        messagingSenderId: "61106039176",
+        appId: "1:61106039176:web:266707c6c9fa2c5a1b723d",
+        measurementId: "G-NS2EZKX6KN"
+    };
+    
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     
     // Ruta a la colección
     const mascotasRef = db.collection('artifacts').doc('buscapatitas').collection('public').doc('data').collection('pets');
 
-async function cargarMascotas() {
+    async function cargarMascotas() {
         const appDiv = document.getElementById('app');
         try {
             const snapshot = await mascotasRef.get();
-            console.log("Total de mascotas encontradas:", snapshot.size); // Mira esto en la consola
-            
             let html = '<h1 class="text-4xl font-black text-center text-orange-600 mb-10">🐾 AdoptaPatitas</h1>';
             html += '<div class="grid grid-cols-1 md:grid-cols-3 gap-8">';
             
+            let encontradas = 0;
             snapshot.forEach(doc => {
                 const m = doc.data();
-                // --- IMPRIME EL ESTADO EN LA CONSOLA ---
-                console.log("Mascota:", m.nombre, "| Estado en BD:", m.estado);
-                
-                // Comparamos sin espacios ni mayúsculas extra por si acaso
-                if (m.estado && m.estado.trim().toLowerCase() === 'adopcion') {
+                // Filtramos por estado "adopcion"
+                if (m.estado === 'adopcion') {
+                    encontradas++;
                     html += `
                         <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all overflow-hidden border border-gray-100">
                             <img src="${m.fotos?.[0] || ''}" class="w-full h-56 object-cover">
                             <div class="p-5">
-                                <h3 class="text-2xl font-bold text-gray-800">${m.nombre}</h3>
-                                <p class="text-sm text-gray-500 mb-4">${m.especie} | ${m.zona}</p>
+                                <h3 class="text-2xl font-bold text-gray-800">${m.nombre || 'Sin nombre'}</h3>
+                                <p class="text-sm text-gray-500 mb-4">${m.especie || 'Mascota'} | ${m.zona || 'N/A'}</p>
                                 <button class="w-full bg-orange-500 text-white font-bold py-3 rounded-xl hover:bg-orange-600">Adoptar</button>
                             </div>
                         </div>
@@ -54,10 +58,15 @@ async function cargarMascotas() {
                 }
             });
             
+            if (encontradas === 0) {
+                html += '<p class="col-span-3 text-center text-gray-500">No hay mascotas en adopción en este momento.</p>';
+            }
+            
             html += '</div>';
             appDiv.innerHTML = html;
         } catch (error) {
-            console.error("Error detallado:", error);
+            console.error(error);
+            appDiv.innerHTML = '<p class="text-center text-red-500">Error al conectar con la base de datos.</p>';
         }
     }
     cargarMascotas();
