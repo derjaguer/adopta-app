@@ -25,17 +25,22 @@
     // Ruta a la colección
     const mascotasRef = db.collection('artifacts').doc('buscapatitas').collection('public').doc('data').collection('pets');
 
-    async function cargarMascotas() {
+async function cargarMascotas() {
         const appDiv = document.getElementById('app');
         try {
             const snapshot = await mascotasRef.get();
+            console.log("Total de mascotas encontradas:", snapshot.size); // Mira esto en la consola
+            
             let html = '<h1 class="text-4xl font-black text-center text-orange-600 mb-10">🐾 AdoptaPatitas</h1>';
             html += '<div class="grid grid-cols-1 md:grid-cols-3 gap-8">';
             
             snapshot.forEach(doc => {
                 const m = doc.data();
-                // --- AQUÍ APLICAMOS EL FILTRO ---
-                if (m.estado === 'adopcion') {
+                // --- IMPRIME EL ESTADO EN LA CONSOLA ---
+                console.log("Mascota:", m.nombre, "| Estado en BD:", m.estado);
+                
+                // Comparamos sin espacios ni mayúsculas extra por si acaso
+                if (m.estado && m.estado.trim().toLowerCase() === 'adopcion') {
                     html += `
                         <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all overflow-hidden border border-gray-100">
                             <img src="${m.fotos?.[0] || ''}" class="w-full h-56 object-cover">
@@ -52,7 +57,7 @@
             html += '</div>';
             appDiv.innerHTML = html;
         } catch (error) {
-            console.error(error);
+            console.error("Error detallado:", error);
         }
     }
     cargarMascotas();
