@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AdoptaPatitas - Sistema de Adopción Responsable</title>
   
+  <!-- ENLACES PWA (NUEVO) -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ea580c">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2138/2138218.png">
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
 
@@ -50,7 +55,7 @@
 
   <!-- Indicador de conexión -->
   <div id="offline-banner" class="hidden bg-yellow-500 text-white text-center py-1 text-sm font-semibold print-hidden flex justify-center items-center">
-    <i data-lucide="alert-circle" class="w-4 h-4 mr-2"></i> Sin conexión. Los datos se guardarán localmente.
+    <i data-lucide="alert-circle" class="w-4 h-4 mr-2"></i> Estás en modo Offline. Puedes seguir guardando, se sincronizará luego.
   </div>
 
   <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-8">
@@ -498,9 +503,10 @@
   <!-- LÓGICA DE JAVASCRIPT -->
   <!-- ============================================== -->
   <script type="module">
+    // IMPORTACIÓN ACTUALIZADA: INCLUYE enableIndexedDbPersistence
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
     import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-    import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+    import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, enableIndexedDbPersistence } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
     // DATOS DE CONFIGURACIÓN
     const firebaseConfig = {
@@ -530,6 +536,16 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+
+    // ACTIVACIÓN DE LA MEMORIA CACHÉ OFFLINE DE FIREBASE
+    enableIndexedDbPersistence(db).catch((err) => {
+        if (err.code == 'failed-precondition') {
+            console.log("Varias pestañas abiertas, la persistencia offline solo funciona en una a la vez.");
+        } else if (err.code == 'unimplemented') {
+            console.log("El navegador actual no soporta almacenamiento offline.");
+        }
+    });
+
     const PATH_BASE = ['artifacts', 'buscapatitas', 'public', 'data']; 
 
     // ESTADOS GLOBALES
@@ -1028,7 +1044,18 @@
     };
 
     // ==============================================
-    // EJECUCIÓN INICIAL (Al final para garantizar que todo el scope existe)
+    // REGISTRO DEL SERVICE WORKER (PARA APP OFFLINE / PWA)
+    // ==============================================
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('Service Worker registrado con éxito', reg))
+          .catch(err => console.log('Error al registrar Service Worker', err));
+      });
+    }
+
+    // ==============================================
+    // EJECUCIÓN INICIAL
     // ==============================================
     lucide.createIcons();
     initMatrizVenezuela();
