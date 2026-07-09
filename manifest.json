@@ -1,0 +1,20 @@
+  "name": "AdoptaPatitas - Rescate Animal",
+  "short_name": "AdoptaPatitas",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ea580c",
+  "description": "Sistema de adopción responsable y gestión de rescates. Funciona sin internet.",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2138/2138218.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2138/2138218.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
