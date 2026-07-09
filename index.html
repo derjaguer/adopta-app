@@ -5,13 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AdoptaPatitas - Sistema de Adopción Responsable</title>
   
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
-    /* Estilos personalizados y Animaciones */
     .fade-in { animation: fadeIn 0.3s ease-in-out; }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
@@ -22,12 +19,16 @@
     }
     .input-custom:focus { outline: none; border-color: #f97316; box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2); background-color: white; }
     
-    /* Ocultar elementos al imprimir */
     @media print {
       .print-hidden { display: none !important; }
       body { background-color: white; }
       .print-shadow-none { box-shadow: none !important; border: 1px solid #e2e8f0; }
     }
+
+    /* Clases para el Slider */
+    .slide { transition: opacity 1s ease-in-out; }
+    .slide-active { opacity: 1; z-index: 10; }
+    .slide-hidden { opacity: 0; z-index: 0; pointer-events: none; }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
@@ -40,15 +41,16 @@
         <span class="text-xl font-bold">AdoptaPatitas</span>
       </div>
       <div class="flex space-x-4">
-        <button onclick="cambiarVista('catalogo')" id="nav-catalogo" class="hover:text-orange-200 font-bold underline">Adoptar</button>
-        <button onclick="cambiarVista('admin')" id="nav-admin" class="hover:text-orange-200">Acceso Refugio</button>
+        <button onclick="cambiarVista('catalogo')" id="nav-catalogo" class="hover:text-orange-200 font-bold underline">Catálogo</button>
+        <button onclick="cambiarVista('dar-adopcion')" id="nav-dar-adopcion" class="hover:text-orange-200">Dar en Adopción</button>
+        <button onclick="cambiarVista('admin')" id="nav-admin" class="hover:text-orange-200">Refugios / Admin</button>
       </div>
     </div>
   </nav>
 
   <!-- Indicador de conexión -->
   <div id="offline-banner" class="hidden bg-yellow-500 text-white text-center py-1 text-sm font-semibold print-hidden flex justify-center items-center">
-    <i data-lucide="alert-circle" class="w-4 h-4 mr-2"></i> Sin conexión. Los datos se guardarán y sincronizarán al volver el internet.
+    <i data-lucide="alert-circle" class="w-4 h-4 mr-2"></i> Sin conexión. Los datos se guardarán localmente.
   </div>
 
   <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-8">
@@ -57,11 +59,25 @@
     <!-- VISTA 1: CATÁLOGO DE ADOPCIONES -->
     <!-- ============================================== -->
     <div id="vista-catalogo" class="fade-in">
-      <div class="bg-white rounded-xl shadow-sm p-8 mb-8 text-center border-t-4 border-orange-500">
-        <h1 class="text-3xl font-bold text-slate-800 mb-4">Adopta, no compres</h1>
-        <p class="text-slate-600 max-w-2xl mx-auto">
-          Estos amiguitos fueron rescatados y no han sido reclamados. Ahora buscan una familia que les dé amor para siempre.
-        </p>
+      
+      <!-- SLIDER HERO -->
+      <div class="relative w-full h-64 md:h-72 rounded-2xl overflow-hidden shadow-md mb-8">
+        <!-- Slide 1 -->
+        <div id="slide-0" class="slide slide-active absolute inset-0 bg-gradient-to-r from-orange-500 to-amber-500 flex flex-col justify-center items-center text-center p-8 text-white">
+          <h1 class="text-3xl md:text-5xl font-black mb-4">Adopta, no compres</h1>
+          <p class="text-lg md:text-xl font-medium max-w-2xl">Estos amiguitos fueron rescatados o entregados y buscan una familia que les dé amor para siempre.</p>
+        </div>
+        <!-- Slide 2 -->
+        <div id="slide-1" class="slide slide-hidden absolute inset-0 bg-gradient-to-r from-blue-600 to-sky-500 flex flex-col justify-center items-center text-center p-8 text-white">
+          <h1 class="text-3xl md:text-5xl font-black mb-4">Dale una segunda oportunidad</h1>
+          <p class="text-lg md:text-xl font-medium max-w-2xl">Si por algún motivo no puedes o deseas tener una mascota, no lo tires a la calle, mejor ponlo en adopción.</p>
+          <button onclick="cambiarVista('dar-adopcion')" class="mt-4 bg-white text-blue-600 px-6 py-2 rounded-full font-bold shadow-md hover:bg-slate-100">Publicar Adopción</button>
+        </div>
+        <!-- Slide 3 -->
+        <div id="slide-2" class="slide slide-hidden absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-500 flex flex-col justify-center items-center text-center p-8 text-white">
+          <h1 class="text-3xl md:text-5xl font-black mb-4">Esterilizar es un acto de amor</h1>
+          <p class="text-lg md:text-xl font-medium max-w-2xl">La esterilización de una mascota es vital para evitar más animalitos inocentes abandonados y sufriendo en la calle.</p>
+        </div>
       </div>
       
       <div id="catalogo-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -70,12 +86,82 @@
       <div id="catalogo-vacio" class="hidden text-center py-20">
         <i data-lucide="heart" class="w-16 h-16 text-slate-300 mx-auto mb-4"></i>
         <h2 class="text-2xl font-bold text-slate-600">No hay peludos en adopción actualmente.</h2>
-        <p class="text-slate-500 mt-2">Los administradores están evaluando casos de rescate. Vuelve pronto.</p>
       </div>
     </div>
 
     <!-- ============================================== -->
-    <!-- VISTA 2: FORMULARIO DE ADOPCIÓN -->
+    <!-- VISTA 2: DAR EN ADOPCIÓN (PÚBLICO) -->
+    <!-- ============================================== -->
+    <div id="vista-dar-adopcion" class="hidden fade-in bg-white p-6 md:p-10 rounded-2xl shadow-lg">
+      <div class="text-center mb-8 border-b-2 border-orange-100 pb-6">
+        <h1 class="text-3xl md:text-4xl font-black text-slate-800">Dar en Adopción</h1>
+        <p class="text-slate-500 mt-2">Encuentra un hogar responsable para esta mascota. Este servicio es 100% gratuito.</p>
+      </div>
+
+      <form onsubmit="publicarDarEnAdopcion(event)" class="space-y-8">
+        
+        <div class="space-y-2">
+          <label class="block text-sm font-bold text-slate-700">Fotos de la mascota (Sube de 1 a 3 fotos)</label>
+          <input type="file" id="p_fotos" accept="image/*" multiple onchange="previsualizarFotosAdopcion(this)" class="hidden">
+          <div onclick="document.getElementById('p_fotos').click()" class="border-2 border-dashed border-slate-300 hover:border-orange-500 rounded-xl p-6 text-center cursor-pointer bg-slate-50">
+            <i data-lucide="image" class="w-10 h-10 mx-auto text-slate-400 mb-2"></i>
+            <p class="text-sm font-bold text-slate-500">Haz clic aquí para seleccionar fotos</p>
+          </div>
+          <div id="p_fotos_preview" class="flex gap-2 mt-3 overflow-x-auto"></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div><label class="font-bold text-slate-700 mb-1 block">Nombre de la Mascota</label><input required type="text" id="p_nombre" class="input-custom"></div>
+          <div><label class="font-bold text-slate-700 mb-1 block">Especie</label><select id="p_especie" class="input-custom"><option>Perro</option><option>Gato</option><option>Otro</option></select></div>
+          <div><label class="font-bold text-slate-700 mb-1 block">Raza o Tipo</label><input required type="text" id="p_raza" placeholder="Ej. Mestizo, Siamés..." class="input-custom"></div>
+          <div><label class="font-bold text-slate-700 mb-1 block">Edad aproximada</label><input required type="text" id="p_edad" placeholder="Ej. 3 meses, 2 años..." class="input-custom"></div>
+          
+          <div>
+            <label class="font-bold text-slate-700 mb-1 block">Plazo de Adopción (Sinceridad)</label>
+            <select id="p_plazo" class="input-custom font-semibold">
+              <option value="Puede Esperar">Puede Esperar un tiempo en casa</option>
+              <option value="Urgente">URGENTE - No puedo tenerlo más tiempo</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50 p-6 rounded-xl border">
+          <h3 class="md:col-span-2 font-bold text-lg border-b pb-2">Ubicación y Contacto</h3>
+          
+          <div>
+            <label class="font-bold text-slate-700 mb-1 block">Estado</label>
+            <select id="p_estado_vzla" onchange="actualizarCiudadesPublicas()" class="input-custom text-orange-800 font-bold"></select>
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 mb-1 block">Ciudad</label>
+            <select id="p_ciudad_vzla" class="input-custom"></select>
+          </div>
+          <div class="md:col-span-2"><label class="font-bold text-slate-700 mb-1 block">Dirección / Zona exacta</label><input required type="text" id="p_direccion" class="input-custom"></div>
+          
+          <div><label class="font-bold text-slate-700 mb-1 block">Nombre del Contacto</label><input required type="text" id="p_contacto_nombre" class="input-custom"></div>
+          <div><label class="font-bold text-slate-700 mb-1 block">WhatsApp de Contacto</label><input required type="tel" id="p_contacto_tel" class="input-custom"></div>
+          <div class="md:col-span-2"><label class="font-bold text-slate-700 mb-1 block">Correo Electrónico</label><input required type="email" id="p_contacto_email" class="input-custom"></div>
+        </div>
+
+        <div class="bg-blue-50 p-6 rounded-xl border border-blue-200">
+          <label class="flex items-start space-x-3 cursor-pointer">
+            <input required type="checkbox" class="w-6 h-6 mt-1 text-blue-600">
+            <span class="text-sm font-bold text-blue-900 leading-relaxed">
+              Acepto que al publicar esta adopción, confirmo que mis datos serán de dominio público. Entiendo que esto es completamente GRATIS, por lo tanto NO se permiten solicitudes de dinero ni remuneración por la mascota. También entiendo que las adopciones responsables llevan tiempo y me comprometo a NO abandonar ni desechar al animal mientras encontramos a la familia ideal.
+            </span>
+          </label>
+        </div>
+
+        <div class="text-center pt-4">
+          <button type="submit" id="btn-publicar-adopcion" class="bg-orange-600 hover:bg-orange-700 text-white text-lg font-black py-4 px-12 rounded-full shadow-lg transition-transform transform hover:scale-105">
+            Publicar Mascota
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- VISTA 3: FORMULARIO DE SOLICITUD DE ADOPCIÓN (EXISTENTE) -->
     <!-- ============================================== -->
     <div id="vista-formulario" class="hidden fade-in bg-white p-4 md:p-8 rounded-2xl shadow-lg print-shadow-none">
       
@@ -96,23 +182,33 @@
       <!-- Tarjeta de Mascota Seleccionada -->
       <div id="form-mascota-info" class="mb-10 bg-orange-50 border border-orange-200 rounded-2xl p-4 flex flex-col sm:flex-row items-center gap-6 shadow-sm">
         <img id="form-mascota-img" src="" class="w-32 h-32 object-cover rounded-xl border-4 border-white shadow-md">
-        <div class="text-center sm:text-left">
+        <div class="text-center sm:text-left flex-grow">
           <h2 class="text-sm font-bold text-orange-800 uppercase tracking-widest">Estás solicitando adoptar a:</h2>
           <h3 id="form-mascota-nombre" class="text-3xl font-black text-slate-900">Nombre</h3>
-          <p class="text-slate-600 mt-1"><span class="font-semibold">Raza/Tipo:</span> <span id="form-mascota-raza"></span> | <span class="font-semibold">Sexo:</span> <span id="form-mascota-sexo"></span></p>
+          <p class="text-slate-600 mt-1"><span class="font-semibold">Raza/Tipo:</span> <span id="form-mascota-raza"></span></p>
+          
+          <!-- Datos Veterinarios Extra -->
+          <div id="form-mascota-vet-info" class="mt-3 flex flex-wrap gap-2 text-xs font-bold"></div>
         </div>
       </div>
 
       <form id="adoption-form" onsubmit="enviarSolicitudAdopcion(event)" class="space-y-10 text-sm md:text-base text-slate-800">
         
         <section class="bg-slate-50 p-6 rounded-xl border border-slate-200">
-          <h2 class="font-bold text-slate-800 mb-4 flex items-center"><i data-lucide="shield-check" class="w-5 h-5 mr-2 text-slate-500"></i> Uso Interno (Rescatista)</h2>
+          <h2 class="font-bold text-slate-800 mb-4 flex items-center"><i data-lucide="shield-check" class="w-5 h-5 mr-2 text-slate-500"></i> Asignación (Uso de Refugios)</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input type="text" id="f_voluntario" placeholder="Nombre del Voluntario Entrevistador" class="input-custom bg-white">
-            <input type="text" id="f_refugio" placeholder="Nombre del Refugio o Fundación" class="input-custom bg-white">
+            <div>
+              <label class="text-xs font-bold text-slate-500 mb-1">Voluntario a cargo de entrevista</label>
+              <input type="text" id="f_voluntario" class="input-custom bg-white">
+            </div>
+            <div>
+              <label class="text-xs font-bold text-slate-500 mb-1">Fundación / Refugio</label>
+              <input type="text" id="f_refugio" class="input-custom bg-white" readonly>
+            </div>
           </div>
         </section>
 
+        <!-- SECCIÓN 1: DATOS PERSONALES -->
         <section>
           <h2 class="font-bold text-2xl border-b-2 border-orange-200 pb-2 mb-6 flex items-center text-orange-800"><i data-lucide="user" class="w-6 h-6 mr-2"></i> 1. Datos del Adoptante</h2>
           <div class="flex flex-col md:flex-row gap-8 mb-6">
@@ -165,6 +261,7 @@
           </div>
         </section>
 
+        <!-- SECCIÓN 2: ENTREVISTA -->
         <section>
           <h2 class="font-bold text-2xl border-b-2 border-orange-200 pb-2 mb-6 flex items-center text-orange-800"><i data-lucide="clipboard-list" class="w-6 h-6 mr-2"></i> 2. Entrevista de Adopción</h2>
           <div class="space-y-5 bg-white p-6 rounded-xl border border-slate-200">
@@ -204,6 +301,7 @@
           </div>
         </section>
 
+        <!-- SECCIÓN 3: COMPROMISOS -->
         <section>
           <h2 class="font-bold text-2xl border-b-2 border-orange-200 pb-2 mb-6 flex items-center text-orange-800"><i data-lucide="heart" class="w-6 h-6 mr-2"></i> 3. Compromisos</h2>
           <label class="font-bold text-slate-700 block mb-3">21. Seleccione las comodidades que garantizará:</label>
@@ -218,6 +316,7 @@
           </div>
         </section>
 
+        <!-- SECCIÓN 4: DECLARACIÓN JURADA -->
         <section class="bg-slate-800 p-8 rounded-2xl text-white shadow-lg print-shadow-none print:bg-white print:text-black">
           <h2 class="font-black text-2xl border-b border-slate-600 pb-3 mb-6 flex items-center text-orange-400 print:text-black"><i data-lucide="alert-circle" class="w-6 h-6 mr-2"></i> 4. Declaración Jurada</h2>
           <div class="space-y-4" id="legales-group">
@@ -244,23 +343,22 @@
     <!-- PANTALLA DE ÉXITO -->
     <div id="vista-exito" class="hidden fade-in bg-white p-12 rounded-xl shadow-md text-center max-w-2xl mx-auto mt-10">
       <i data-lucide="check-circle" class="w-20 h-20 text-green-500 mx-auto mb-6"></i>
-      <h2 class="text-3xl font-bold mb-4">¡Solicitud Enviada!</h2>
-      <p class="text-slate-600 mb-8 text-lg">Tu solicitud ha sido registrada en el sistema. Los administradores la evaluarán y te contactarán.</p>
-      <button onclick="cambiarVista('catalogo')" class="bg-orange-600 text-white px-8 py-3 rounded-xl font-bold shadow-md hover:bg-orange-700">Volver al Catálogo</button>
+      <h2 class="text-3xl font-bold mb-4">¡Realizado con Éxito!</h2>
+      <p class="text-slate-600 mb-8 text-lg">La información ha sido registrada en nuestro sistema correctamente.</p>
+      <button onclick="cambiarVista('catalogo')" class="bg-orange-600 text-white px-8 py-3 rounded-xl font-bold shadow-md hover:bg-orange-700">Volver al Inicio</button>
     </div>
 
     <!-- ============================================== -->
-    <!-- VISTA 3: ADMIN -->
+    <!-- VISTA 4: ADMIN / REFUGIOS -->
     <!-- ============================================== -->
     <div id="vista-admin" class="hidden fade-in">
       
       <!-- Login -->
       <div id="admin-login" class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-md text-center mt-10">
         <i data-lucide="shield-check" class="w-16 h-16 text-slate-300 mx-auto mb-4"></i>
-        <h2 class="text-2xl font-black text-slate-800 mb-2">Acceso a Refugios</h2>
-        <p class="text-sm text-slate-500 mb-6">Área restringida para evaluadores.</p>
-        <div id="admin-no-users-warning" class="hidden bg-yellow-100 text-yellow-800 p-2 text-xs rounded mb-4 font-bold">No hay admins.</div>
-        <input type="password" id="admin-passcode" placeholder="Contraseña" class="w-full p-3 border rounded-xl text-center font-mono tracking-widest mb-4 bg-slate-50">
+        <h2 class="text-2xl font-black text-slate-800 mb-2">Acceso Administrativo</h2>
+        <p class="text-sm text-slate-500 mb-6">Área para Refugios, Fundaciones y SuperAdmins.</p>
+        <input type="password" id="admin-passcode" placeholder="Contraseña de Acceso" class="w-full p-3 border rounded-xl text-center font-mono tracking-widest mb-4 bg-slate-50">
         <button onclick="intentarLoginAdmin()" class="w-full bg-slate-900 text-white font-bold py-3 rounded-xl hover:bg-slate-800">Verificar Credenciales</button>
       </div>
 
@@ -268,19 +366,22 @@
       <div id="admin-dashboard" class="hidden bg-white rounded-2xl shadow-lg overflow-hidden">
         <div class="bg-slate-900 text-white p-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <div>
-            <h2 class="text-2xl font-black flex items-center"><i data-lucide="shield-check" class="w-6 h-6 mr-2 text-orange-500"></i> Panel de Control</h2>
-            <p class="text-xs text-slate-400">Conectado a Buscapatitas</p>
+            <h2 class="text-2xl font-black flex items-center">
+              <i data-lucide="shield-check" class="w-6 h-6 mr-2 text-orange-500"></i> Panel de <span id="admin-role-title" class="ml-2 text-orange-400">Control</span>
+            </h2>
+            <p class="text-xs text-slate-400" id="admin-org-name">Conectado a la red de protección</p>
           </div>
-          <div class="flex gap-2">
+          <div class="flex gap-2 flex-wrap">
             <button onclick="cambiarTabAdmin('solicitudes')" id="tab-btn-solicitudes" class="px-4 py-2 rounded-lg text-sm font-bold bg-orange-600">Solicitudes</button>
             <button onclick="cambiarTabAdmin('mascotas')" id="tab-btn-mascotas" class="px-4 py-2 rounded-lg text-sm font-bold bg-slate-800 hover:bg-slate-700">Mascotas</button>
-            <button onclick="cambiarTabAdmin('config')" id="tab-btn-config" class="px-4 py-2 rounded-lg text-sm font-bold bg-slate-800 hover:bg-slate-700">Admins</button>
+            <button onclick="cambiarTabAdmin('voluntarios')" id="tab-btn-voluntarios" class="px-4 py-2 rounded-lg text-sm font-bold bg-slate-800 hover:bg-slate-700">Voluntarios</button>
+            <button onclick="cambiarTabAdmin('config')" id="tab-btn-config" class="hidden px-4 py-2 rounded-lg text-sm font-bold bg-slate-800 hover:bg-slate-700">SuperAdmin</button>
             <button onclick="cerrarSesionAdmin()" class="px-4 py-2 rounded-lg text-sm font-bold bg-red-900/50 hover:bg-red-800 text-red-200">Salir</button>
           </div>
         </div>
 
         <div class="p-6 overflow-x-auto min-h-[400px]">
-          <!-- TABS -->
+          <!-- TAB: Solicitudes -->
           <div id="tab-solicitudes">
             <table class="w-full text-left border-collapse text-sm">
               <thead>
@@ -292,41 +393,106 @@
             </table>
           </div>
 
+          <!-- TAB: Mascotas -->
           <div id="tab-mascotas" class="hidden">
-            <div class="mb-4 text-sm text-slate-600 bg-blue-50 p-4 rounded-xl border border-blue-100 flex items-center">
-              <i data-lucide="alert-circle" class="w-5 h-5 text-blue-500 mr-2"></i> Aquí ves los animales reportados. Si no fueron reclamados, pásalos al catálogo de Adopciones.
-            </div>
+            <button onclick="abrirModalEdicion(null)" class="mb-4 bg-orange-600 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-md hover:bg-orange-700">+ Publicar Nueva Mascota (Refugio)</button>
             <table class="w-full text-left border-collapse text-sm">
               <thead>
                 <tr class="bg-slate-100 text-slate-600 uppercase text-xs">
-                  <th class="p-3 border-b">Mascota</th><th class="p-3 border-b">Ubicación</th><th class="p-3 border-b">Estatus</th><th class="p-3 border-b text-right">Acción</th>
+                  <th class="p-3 border-b">Mascota</th><th class="p-3 border-b">Datos Salud</th><th class="p-3 border-b">Estatus</th><th class="p-3 border-b text-right">Acción</th>
                 </tr>
               </thead>
               <tbody id="tabla-mascotas-admin"></tbody>
             </table>
           </div>
 
-          <div id="tab-config" class="hidden">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- TAB: Voluntarios -->
+          <div id="tab-voluntarios" class="hidden">
+             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-                <h3 class="font-bold text-lg mb-4">Crear Administrador</h3>
-                <form onsubmit="crearNuevoAdmin(event)" class="space-y-4">
-                  <input required type="text" id="new_admin_user" placeholder="Nombre de Usuario" class="input-custom bg-white">
-                  <input required type="password" id="new_admin_pass" placeholder="Contraseña Segura" class="input-custom bg-white">
-                  <button type="submit" class="w-full bg-slate-900 text-white font-bold py-3 rounded-lg">Guardar Usuario</button>
-                </form>
+                <h3 class="font-bold text-lg mb-4">Añadir Voluntario a mi Refugio</h3>
+                <div class="flex gap-2">
+                  <input type="text" id="new_voluntario_nombre" placeholder="Nombre completo del voluntario" class="input-custom bg-white">
+                  <button onclick="agregarVoluntario()" class="bg-slate-900 text-white font-bold px-4 rounded-lg">Añadir</button>
+                </div>
               </div>
               <div>
-                <h3 class="font-bold text-lg mb-4">Administradores Activos</h3>
-                <div id="lista-admins-activos" class="space-y-3"></div>
+                <h3 class="font-bold text-lg mb-4">Mis Voluntarios / Proteccionistas</h3>
+                <ul id="lista-voluntarios-activos" class="space-y-2"></ul>
               </div>
             </div>
           </div>
 
+          <!-- TAB: SuperAdmin Config -->
+          <div id="tab-config" class="hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                <h3 class="font-bold text-lg mb-4">Crear Nuevo Perfil Administrativo</h3>
+                <form onsubmit="crearNuevoAdmin(event)" class="space-y-4">
+                  <input required type="text" id="new_admin_user" placeholder="Usuario de Acceso" class="input-custom bg-white">
+                  <input required type="password" id="new_admin_pass" placeholder="Contraseña" class="input-custom bg-white">
+                  <select id="new_admin_role" class="input-custom bg-white font-bold">
+                    <option value="refugio">Rol: Refugio / Fundación</option>
+                    <option value="superadmin">Rol: Super Administrador</option>
+                  </select>
+                  <input required type="text" id="new_admin_org" placeholder="Nombre Oficial de la Fundación/Albergue" class="input-custom bg-white">
+                  <button type="submit" class="w-full bg-slate-900 text-white font-bold py-3 rounded-lg">Guardar Perfil</button>
+                </form>
+              </div>
+              <div>
+                <h3 class="font-bold text-lg mb-4">Usuarios Activos</h3>
+                <div id="lista-admins-activos" class="space-y-3"></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </main>
+
+  <!-- MODAL EDITAR / CREAR MASCOTA ADMIN -->
+  <div id="modal-mascota" class="hidden fixed inset-0 bg-black/60 z-[60] flex justify-center items-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto relative">
+      <div class="sticky top-0 bg-white border-b p-4 flex justify-between items-center z-10">
+        <h2 class="text-xl font-bold text-slate-800" id="modal-mascota-titulo">Editar Mascota</h2>
+        <button onclick="cerrarModalEdicion()" class="text-slate-500 hover:text-red-500"><i data-lucide="x" class="w-6 h-6"></i></button>
+      </div>
+      <form onsubmit="guardarEdicionMascota(event)" class="p-6 space-y-6">
+        <input type="hidden" id="e_mascota_id">
+        <input type="hidden" id="e_mascota_source">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div><label class="font-bold text-xs text-slate-500 mb-1">Nombre</label><input required type="text" id="e_nombre" class="input-custom"></div>
+          <div><label class="font-bold text-xs text-slate-500 mb-1">Especie</label><input required type="text" id="e_especie" class="input-custom"></div>
+          <div><label class="font-bold text-xs text-slate-500 mb-1">Raza</label><input type="text" id="e_raza" class="input-custom"></div>
+          <div><label class="font-bold text-xs text-slate-500 mb-1">Sexo</label><input type="text" id="e_sexo" class="input-custom"></div>
+          <div><label class="font-bold text-xs text-slate-500 mb-1">Estado en App</label>
+            <select id="e_estado" class="input-custom font-bold text-orange-600">
+              <option value="adopcion">En Adopción (Catálogo)</option>
+              <option value="perdido">Buscado (Solo rescates)</option>
+              <option value="encontrado">Encontrado (Solo rescates)</option>
+            </select>
+          </div>
+          <div><label class="font-bold text-xs text-slate-500 mb-1">Zona</label><input type="text" id="e_zona" class="input-custom"></div>
+        </div>
+
+        <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+          <h3 class="font-bold text-sm text-blue-900 mb-3 border-b border-blue-200 pb-2">Perfil Veterinario y Responsable</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <label class="flex items-center space-x-2"><input type="checkbox" id="e_vacunado" class="w-5 h-5 rounded text-blue-600"><span class="text-sm font-semibold">Vacunado</span></label>
+            <label class="flex items-center space-x-2"><input type="checkbox" id="e_esterilizado" class="w-5 h-5 rounded text-blue-600"><span class="text-sm font-semibold">Esterilizado</span></label>
+            <label class="flex items-center space-x-2"><input type="checkbox" id="e_desparasitado" class="w-5 h-5 rounded text-blue-600"><span class="text-sm font-semibold">Desparasitado</span></label>
+          </div>
+          <div class="mt-4">
+            <label class="font-bold text-xs text-slate-500 mb-1">Voluntario / Proteccionista a Cargo</label>
+            <select id="e_responsable" class="input-custom bg-white"></select>
+          </div>
+        </div>
+
+        <button type="submit" class="w-full bg-slate-900 text-white font-bold py-3 rounded-lg shadow-md hover:bg-slate-800">Guardar Cambios</button>
+      </form>
+    </div>
+  </div>
 
   <!-- ============================================== -->
   <!-- LÓGICA DE JAVASCRIPT -->
@@ -361,103 +527,87 @@
       "Yaracuy": ["San Felipe", "Yaritagua", "Chivacoa"], "Zulia": ["Maracaibo", "San Francisco", "Cabimas", "Ciudad Ojeda", "Machiques"]
     };
 
-    // INIT FIREBASE
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    const PATH_BASE = ['artifacts', 'buscapatitas', 'public', 'data']; // Ruta estricta de tu proyecto anterior
+    const PATH_BASE = ['artifacts', 'buscapatitas', 'public', 'data']; 
 
     // ESTADOS GLOBALES
     let user = null;
-    let baseMascotas = [];
+    let baseMascotas = []; 
+    let baseAdopcionesPublicas = [];
     let baseSolicitudes = [];
     let baseAdmins = [];
+    
     let mascotaSeleccionada = null;
     let fotoAdoptanteBase64 = '';
+    let fotosAdopcionNueva = [];
+    
+    let adminRole = null;
+    let adminInfo = null;
 
     // ==============================================
-    // INICIALIZACIÓN
+    // FUNCIONES DECLARADAS
     // ==============================================
-    lucide.createIcons();
-    initMatrizVenezuela();
-    generarCheckboxesFormulario();
-
-    signInAnonymously(auth).catch(err => console.error("Error Auth:", err));
-
-    onAuthStateChanged(auth, (u) => {
-      user = u;
-      if (user) iniciarEscuchadores();
-    });
-
-    window.addEventListener('online', () => document.getElementById('offline-banner').classList.add('hidden'));
-    window.addEventListener('offline', () => document.getElementById('offline-banner').classList.remove('hidden'));
 
     function iniciarEscuchadores() {
-      // MASCOTAS
       onSnapshot(collection(db, ...PATH_BASE, 'pets'), (snap) => {
-        baseMascotas = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        baseMascotas = snap.docs.map(d => ({ id: d.id, ...d.data(), source: 'pets' }));
         renderizarCatalogo();
-        if(document.getElementById('admin-dashboard').classList.contains('hidden') === false) renderizarAdminMascotas();
+        if(adminRole) renderizarAdminMascotas();
       });
-      // SOLICITUDES
+      onSnapshot(collection(db, ...PATH_BASE, 'adopciones_publicas'), (snap) => {
+        baseAdopcionesPublicas = snap.docs.map(d => ({ id: d.id, ...d.data(), source: 'publicas' }));
+        renderizarCatalogo();
+        if(adminRole) renderizarAdminMascotas();
+      });
       onSnapshot(collection(db, ...PATH_BASE, 'solicitudes'), (snap) => {
         baseSolicitudes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        if(document.getElementById('admin-dashboard').classList.contains('hidden') === false) renderizarAdminSolicitudes();
+        if(adminRole) renderizarAdminSolicitudes();
       });
-      // ADMINS
       onSnapshot(collection(db, ...PATH_BASE, 'admins'), (snap) => {
         baseAdmins = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        document.getElementById('admin-no-users-warning').classList.toggle('hidden', baseAdmins.length > 0);
-        if(document.getElementById('admin-dashboard').classList.contains('hidden') === false) renderizarAdminLista();
+        if(adminRole === 'superadmin') renderizarAdminLista();
       });
     }
 
-    // ==============================================
-    // UI Y NAVEGACIÓN
-    // ==============================================
-    window.cambiarVista = function(vista) {
-      document.getElementById('vista-catalogo').classList.add('hidden');
-      document.getElementById('vista-formulario').classList.add('hidden');
-      document.getElementById('vista-admin').classList.add('hidden');
-      document.getElementById('vista-exito').classList.add('hidden');
-      
-      document.getElementById('nav-catalogo').classList.remove('font-bold', 'underline');
-      document.getElementById('nav-admin').classList.remove('font-bold', 'underline');
+    function iniciarSlider() {
+      let currentSlide = 0;
+      setInterval(() => {
+        document.getElementById(`slide-${currentSlide}`).classList.replace('slide-active', 'slide-hidden');
+        currentSlide = (currentSlide + 1) % 3;
+        document.getElementById(`slide-${currentSlide}`).classList.replace('slide-hidden', 'slide-active');
+      }, 5000);
+    }
 
-      document.getElementById(`vista-${vista}`).classList.remove('hidden');
-      if(vista === 'catalogo' || vista === 'admin') document.getElementById(`nav-${vista}`).classList.add('font-bold', 'underline');
-      window.scrollTo(0,0);
-    };
-
-    // ==============================================
-    // CATÁLOGO
-    // ==============================================
     function renderizarCatalogo() {
       const grid = document.getElementById('catalogo-grid');
       const empty = document.getElementById('catalogo-vacio');
       grid.innerHTML = '';
       
-      const enAdopcion = baseMascotas.filter(m => m.estado === 'adopcion');
+      const enAdopcionRescate = baseMascotas.filter(m => m.estado === 'adopcion');
+      const todasAdopciones = [...enAdopcionRescate, ...baseAdopcionesPublicas];
       
-      if (enAdopcion.length === 0) {
+      if (todasAdopciones.length === 0) {
         grid.classList.add('hidden'); empty.classList.remove('hidden');
       } else {
         grid.classList.remove('hidden'); empty.classList.add('hidden');
-        enAdopcion.forEach(m => {
+        todasAdopciones.forEach(m => {
+          const badgeColor = m.plazo === 'Urgente' ? 'bg-red-500' : 'bg-green-500';
+          const badgeText = m.plazo === 'Urgente' ? 'Urgente' : 'En Adopción';
           grid.innerHTML += `
             <div class="bg-white rounded-xl overflow-hidden shadow-md flex flex-col">
-              <div class="relative h-64 bg-gray-100">
+              <div class="relative h-64 bg-slate-100">
                 <img src="${m.fotos?.[0] || ''}" class="w-full h-full object-cover">
-                <span class="absolute top-3 right-3 bg-green-500 text-white text-xs px-3 py-1 rounded-full font-bold">En Adopción</span>
+                <span class="absolute top-3 right-3 ${badgeColor} text-white text-xs px-3 py-1 rounded-full font-bold shadow-sm">${badgeText}</span>
               </div>
               <div class="p-5 flex flex-col flex-grow justify-between">
                 <div>
                   <h3 class="text-xl font-bold uppercase">${m.nombre}</h3>
-                  <p class="text-sm mt-1">Especie: ${m.especie}</p>
-                  <p class="text-sm">Zona: ${m.zona}</p>
-                  <p class="text-xs italic mt-2 text-slate-500 line-clamp-2">"${m.rasgos}"</p>
+                  <p class="text-sm mt-1 font-semibold text-slate-500">${m.especie} | ${m.edad || 'Edad N/E'}</p>
+                  <p class="text-sm"><i data-lucide="map-pin" class="w-3 h-3 inline"></i> ${m.ciudad || m.zona}</p>
                 </div>
-                <button onclick="prepararFormulario('${m.id}')" class="w-full bg-orange-600 text-white font-bold py-3 rounded-xl mt-4 flex justify-center items-center">
+                <button onclick="prepararFormulario('${m.id}', '${m.source}')" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded-xl mt-4 flex justify-center items-center shadow-md transition-all">
                   <i data-lucide="heart" class="w-5 h-5 mr-2"></i> Quiero Adoptarlo
                 </button>
               </div>
@@ -467,167 +617,52 @@
       }
     }
 
-    // ==============================================
-    // FORMULARIO Y MATRIZ
-    // ==============================================
     function initMatrizVenezuela() {
-      const selectEst = document.getElementById('f_estado');
-      Object.keys(VENEZUELA).sort().forEach(est => selectEst.add(new Option(est, est)));
-      actualizarCiudades();
-    }
-    
-    function actualizarCiudades() {
-      const est = document.getElementById('f_estado').value;
-      const selectCiu = document.getElementById('f_ciudad');
-      selectCiu.innerHTML = '';
-      if(VENEZUELA[est]) {
-        VENEZUELA[est].forEach(ciu => selectCiu.add(new Option(ciu, ciu)));
-      }
-    }
-    window.actualizarCiudades = actualizarCiudades;
-
-    window.toggleArrendamiento = () => {
-      const val = document.getElementById('f_estadoCasa').value;
-      document.getElementById('bloque_arrendamiento').classList.toggle('hidden', val === 'Propia');
-    }
-    window.togglePareja = () => {
-      const val = document.getElementById('f_estadoCivil').value;
-      const isPareja = ['Casado(a)', 'Concubinato', 'Noviazgo'].includes(val);
-      document.getElementById('bloque_pareja').classList.toggle('hidden', !isPareja);
-    }
-    window.toggleInput = (selectId, inputId, valorTrigger = 'Si') => {
-      const s = document.getElementById(selectId);
-      const i = document.getElementById(inputId);
-      if(s.value === valorTrigger) { i.classList.remove('hidden'); i.required = true; } 
-      else { i.classList.add('hidden'); i.required = false; i.value = ''; }
-    }
-
-    window.cargarFotoAdoptante = function(input) {
-      if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          fotoAdoptanteBase64 = e.target.result;
-          document.getElementById('f_foto_preview').src = fotoAdoptanteBase64;
-          document.getElementById('f_foto_preview').classList.remove('hidden');
-          document.getElementById('f_foto_placeholder').classList.add('hidden');
-        }
-        reader.readAsDataURL(input.files[0]);
-      }
+      const s1 = document.getElementById('f_estado');
+      const s2 = document.getElementById('p_estado_vzla');
+      Object.keys(VENEZUELA).sort().forEach(est => {
+        s1.add(new Option(est, est));
+        s2.add(new Option(est, est));
+      });
+      window.actualizarCiudades();
+      window.actualizarCiudadesPublicas();
     }
 
     function generarCheckboxesFormulario() {
-      const comodidades = ['Visitas al Veterinario', 'Vacunación y Vitaminas', 'Paseos Diarios', 'Collar con Identificación', 'Agua Fresca', 'Alimento propio', 'Desparasitación', 'Baño Semanal', 'Área Limpia'];
+      const comodidades = ['Visitas al Veterinario', 'Vacunas y Vitaminas', 'Paseos Diarios', 'Collar Identificación', 'Agua Fresca', 'Alimento propio', 'Desparasitación', 'Baño Semanal', 'Área Limpia'];
       const cg = document.getElementById('checkbox-group');
-      comodidades.forEach((c, i) => {
-        cg.innerHTML += `<label class="flex items-center space-x-3"><input type="checkbox" id="c_comodidad_${i}" class="w-5 h-5 text-orange-600"><span class="font-medium text-sm">${c}</span></label>`;
-      });
-
-      const legales = [
-        '25. Entiendo que seré visitado sorpresivamente por un Voluntario.',
-        '26. Entiendo las responsabilidades físicas, de tiempo y económicas.',
-        '27. He leído y acepto sin reservas las condiciones.',
-        '28. Entiendo las penas legales por maltrato animal.',
-        '29. Juro que la información es real.'
-      ];
+      comodidades.forEach((c, i) => cg.innerHTML += `<label class="flex items-center space-x-3"><input type="checkbox" id="c_comodidad_${i}" class="w-5 h-5 text-orange-600"><span class="font-medium text-sm">${c}</span></label>`);
+      const legales = ['Visitas de control sorpresa.', 'Entiendo responsabilidades físicas/económicas.', 'Acepto sin reservas condiciones.', 'Penas legales por maltrato animal.', 'Información es 100% real.'];
       const lg = document.getElementById('legales-group');
-      legales.forEach((l, i) => {
-        lg.innerHTML += `<label class="flex items-start space-x-4"><input required type="checkbox" id="c_legal_${i}" class="w-6 h-6 mt-0.5 text-orange-500 rounded"><span class="text-sm font-medium leading-tight">${l}</span></label>`;
-      });
-    }
-
-    window.prepararFormulario = function(id) {
-      mascotaSeleccionada = baseMascotas.find(m => m.id === id);
-      document.getElementById('form-mascota-img').src = mascotaSeleccionada.fotos?.[0] || '';
-      document.getElementById('form-mascota-nombre').innerText = mascotaSeleccionada.nombre;
-      document.getElementById('form-mascota-raza').innerText = mascotaSeleccionada.raza;
-      document.getElementById('form-mascota-sexo').innerText = mascotaSeleccionada.sexo;
-      cambiarVista('formulario');
-    }
-
-    window.enviarSolicitudAdopcion = async function(e) {
-      e.preventDefault();
-      const firma = document.getElementById('f_firma').value.trim().toLowerCase();
-      const nombreCompleto = `${document.getElementById('f_nombres').value} ${document.getElementById('f_apellidos').value}`.trim().toLowerCase();
-      
-      if (firma !== nombreCompleto) {
-        alert("La firma final debe coincidir exactamente con sus Nombres y Apellidos.");
-        return;
-      }
-
-      document.getElementById('btn-enviar-form').innerText = "PROCESANDO...";
-      document.getElementById('btn-enviar-form').disabled = true;
-
-      const solicitud = {
-        mascotaId: mascotaSeleccionada?.id,
-        mascotaNombre: mascotaSeleccionada?.nombre,
-        numeroUnico: 'ADOP-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
-        fecha: new Date().toISOString(),
-        estadoSolicitud: 'Pendiente',
-        userId: user.uid,
-        fotoAdoptante: fotoAdoptanteBase64,
-        adoptante: nombreCompleto,
-        cedula: document.getElementById('f_identificacion').value,
-        telefono: document.getElementById('f_tel1').value,
-        ciudad: document.getElementById('f_ciudad').value,
-        // ... (Agrega aquí el mapeo del resto de campos si necesitas leerlos en el admin)
-      };
-
-      try {
-        await addDoc(collection(db, ...PATH_BASE, 'solicitudes'), solicitud);
-        document.getElementById('adoption-form').reset();
-        document.getElementById('f_foto_preview').classList.add('hidden');
-        document.getElementById('f_foto_placeholder').classList.remove('hidden');
-        cambiarVista('exito');
-      } catch (error) {
-        alert("Error al guardar la solicitud.");
-        console.error(error);
-      }
-      document.getElementById('btn-enviar-form').innerText = "ENVIAR SOLICITUD DEFINITIVA";
-      document.getElementById('btn-enviar-form').disabled = false;
-    }
-
-    // ==============================================
-    // ADMIN 
-    // ==============================================
-    window.intentarLoginAdmin = function() {
-      const pass = document.getElementById('admin-passcode').value;
-      if (baseAdmins.length === 0 && pass === '.2411Patty..') {
-        entrarAdmin();
-      } else if (baseAdmins.find(a => a.pass === pass)) {
-        entrarAdmin();
-      } else {
-        alert("Contraseña incorrecta");
-      }
+      legales.forEach((l, i) => lg.innerHTML += `<label class="flex items-start space-x-4"><input required type="checkbox" id="c_legal_${i}" class="w-6 h-6 mt-0.5 text-orange-500 rounded"><span class="text-sm font-medium leading-tight">${l}</span></label>`);
     }
 
     function entrarAdmin() {
       document.getElementById('admin-login').classList.add('hidden');
       document.getElementById('admin-dashboard').classList.remove('hidden');
       document.getElementById('admin-passcode').value = '';
-      cambiarTabAdmin('solicitudes');
+      
+      document.getElementById('admin-role-title').innerText = adminRole === 'superadmin' ? 'SuperAdmin' : 'Refugio';
+      document.getElementById('admin-org-name').innerText = adminInfo.org || 'Proteccionista';
+
+      if(adminRole === 'superadmin') {
+        document.getElementById('tab-btn-config').classList.remove('hidden');
+      } else {
+        document.getElementById('tab-btn-config').classList.add('hidden');
+      }
+
+      window.cambiarTabAdmin('solicitudes');
       renderizarAdminSolicitudes();
       renderizarAdminMascotas();
-      renderizarAdminLista();
+      if(adminRole === 'superadmin') renderizarAdminLista();
+      if(adminInfo.voluntarios) renderizarListaVoluntarios();
     }
 
-    window.cerrarSesionAdmin = function() {
-      document.getElementById('admin-dashboard').classList.add('hidden');
-      document.getElementById('admin-login').classList.remove('hidden');
-    }
-
-    window.cambiarTabAdmin = function(tab) {
-      ['solicitudes', 'mascotas', 'config'].forEach(t => {
-        document.getElementById(`tab-${t}`).classList.add('hidden');
-        document.getElementById(`tab-btn-${t}`).classList.replace('bg-orange-600', 'bg-slate-800');
-      });
-      document.getElementById(`tab-${tab}`).classList.remove('hidden');
-      document.getElementById(`tab-btn-${tab}`).classList.replace('bg-slate-800', 'bg-orange-600');
-    }
-
-    // -- Funciones Admin Solicitudes --
     function renderizarAdminSolicitudes() {
       const tb = document.getElementById('tabla-solicitudes');
-      tb.innerHTML = baseSolicitudes.map(s => `
+      const sols = adminRole === 'superadmin' ? baseSolicitudes : baseSolicitudes.filter(s => s.refugioVinculado === adminInfo.org);
+      
+      tb.innerHTML = sols.map(s => `
         <tr class="border-b hover:bg-slate-50">
           <td class="p-3 font-mono text-xs">${s.numeroUnico}</td>
           <td class="p-3"><b>${s.adoptante}</b><br><span class="text-xs text-orange-600">${s.telefono}</span></td>
@@ -642,67 +677,373 @@
       lucide.createIcons();
     }
 
-    window.actEstadoSol = async function(id, estado) {
-      try { await updateDoc(doc(db, ...PATH_BASE, 'solicitudes', id), { estadoSolicitud: estado }); } 
-      catch (e) { alert("Error"); }
-    }
-
-    // -- Funciones Admin Mascotas --
     function renderizarAdminMascotas() {
       const tb = document.getElementById('tabla-mascotas-admin');
-      tb.innerHTML = baseMascotas.map(m => `
+      const todas = [...baseMascotas, ...baseAdopcionesPublicas];
+      const filtradas = adminRole === 'superadmin' ? todas : todas.filter(m => m.refugio === adminInfo.org);
+
+      tb.innerHTML = filtradas.map(m => {
+        let vText = [];
+        if(m.vacunado) vText.push('Vac.'); if(m.esterilizado) vText.push('Est.');
+        return `
         <tr class="border-b hover:bg-slate-50">
           <td class="p-3 flex items-center gap-3">
-            <img src="${m.fotos?.[0] || ''}" class="w-10 h-10 object-cover rounded bg-gray-200">
-            <div><b>${m.nombre}</b><div class="text-[10px] uppercase">${m.especie}</div></div>
+            <img src="${m.fotos?.[0] || ''}" class="w-10 h-10 object-cover rounded bg-slate-200">
+            <div><b>${m.nombre}</b><div class="text-[10px] text-slate-500">${m.source === 'pets' ? 'Rescate' : 'Publicación'}</div></div>
           </td>
-          <td class="p-3 text-slate-600">${m.zona}</td>
-          <td class="p-3"><span class="font-bold text-xs uppercase px-2 py-1 bg-gray-100 rounded text-gray-600">${m.estado}</span></td>
+          <td class="p-3 text-xs text-slate-600">${vText.length > 0 ? vText.join(', ') : 'Sin datos'}</td>
+          <td class="p-3"><span class="font-bold text-[10px] uppercase px-2 py-1 bg-gray-100 rounded text-gray-600">${m.estado}</span></td>
           <td class="p-3 text-right">
-            ${m.estado !== 'adopcion' 
-              ? `<button onclick="ponerEnAdopcion('${m.id}')" class="bg-yellow-500 text-white text-xs font-bold px-3 py-1.5 rounded">Poner en Adopción</button>`
-              : `<span class="text-green-600 font-bold text-xs">En Catálogo</span>`}
+            <button onclick="abrirModalEdicion('${m.id}', '${m.source}')" class="bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold px-3 py-2 rounded shadow">Editar</button>
           </td>
         </tr>
-      `).join('');
+      `}).join('');
     }
 
-    window.ponerEnAdopcion = async function(id) {
-      if(confirm("¿Poner en adopción?")) {
-        try { await updateDoc(doc(db, ...PATH_BASE, 'pets', id), { estado: 'adopcion' }); }
-        catch (e) { alert("Error"); }
-      }
+    function renderizarListaVoluntarios() {
+      const ul = document.getElementById('lista-voluntarios-activos');
+      ul.innerHTML = (adminInfo.voluntarios || []).map(v => `
+        <li class="bg-white p-3 border rounded-lg font-bold text-slate-700 flex justify-between">
+          <span><i data-lucide="user" class="w-4 h-4 inline mr-2 text-slate-400"></i>${v}</span>
+        </li>`).join('');
+      lucide.createIcons();
     }
 
-    // -- Funciones Admin Config --
     function renderizarAdminLista() {
       const c = document.getElementById('lista-admins-activos');
       c.innerHTML = baseAdmins.map(a => `
-        <div class="flex justify-between p-4 border rounded-xl bg-white">
-          <span class="font-bold flex items-center"><i data-lucide="lock" class="w-4 h-4 mr-2 text-green-500"></i> ${a.user}</span>
-          <button onclick="borrarAdmin('${a.id}')" class="text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+        <div class="flex justify-between items-center p-4 border rounded-xl bg-white mb-2">
+          <div>
+            <span class="font-bold block text-slate-800">${a.org}</span>
+            <span class="text-xs text-slate-500 uppercase">${a.role} | Usuario: ${a.user}</span>
+          </div>
+          <button onclick="borrarAdmin('${a.id}')" class="text-red-500 hover:bg-red-50 p-2 rounded"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
         </div>
       `).join('');
       lucide.createIcons();
     }
+
+    // ==============================================
+    // FUNCIONES GLOBALES ASIGNADAS A WINDOW
+    // ==============================================
+    window.cambiarVista = function(vista) {
+      ['vista-catalogo', 'vista-formulario', 'vista-admin', 'vista-exito', 'vista-dar-adopcion'].forEach(v => document.getElementById(v).classList.add('hidden'));
+      ['nav-catalogo', 'nav-dar-adopcion', 'nav-admin'].forEach(n => document.getElementById(n).classList.remove('font-bold', 'underline'));
+
+      document.getElementById(`vista-${vista}`).classList.remove('hidden');
+      if(document.getElementById(`nav-${vista}`)) document.getElementById(`nav-${vista}`).classList.add('font-bold', 'underline');
+      window.scrollTo(0,0);
+    };
+
+    window.actualizarCiudades = function() {
+      const est = document.getElementById('f_estado').value;
+      const selectCiu = document.getElementById('f_ciudad');
+      selectCiu.innerHTML = '';
+      if(VENEZUELA[est]) VENEZUELA[est].forEach(ciu => selectCiu.add(new Option(ciu, ciu)));
+    };
+    
+    window.actualizarCiudadesPublicas = function() {
+      const est = document.getElementById('p_estado_vzla').value;
+      const selectCiu = document.getElementById('p_ciudad_vzla');
+      selectCiu.innerHTML = '';
+      if(VENEZUELA[est]) VENEZUELA[est].forEach(ciu => selectCiu.add(new Option(ciu, ciu)));
+    };
+
+    window.toggleArrendamiento = () => document.getElementById('bloque_arrendamiento').classList.toggle('hidden', document.getElementById('f_estadoCasa').value === 'Propia');
+    window.togglePareja = () => document.getElementById('bloque_pareja').classList.toggle('hidden', !['Casado(a)', 'Concubinato', 'Noviazgo'].includes(document.getElementById('f_estadoCivil').value));
+    window.toggleInput = (sId, iId, vTrig = 'Si') => {
+      const i = document.getElementById(iId);
+      if(document.getElementById(sId).value === vTrig) { i.classList.remove('hidden'); i.required = true; } else { i.classList.add('hidden'); i.required = false; }
+    };
+
+    window.previsualizarFotosAdopcion = function(input) {
+      const container = document.getElementById('p_fotos_preview');
+      container.innerHTML = '';
+      fotosAdopcionNueva = [];
+
+      const files = Array.from(input.files).slice(0, 3);
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 500; 
+            const scale = MAX_WIDTH / img.width;
+            canvas.width = MAX_WIDTH; canvas.height = img.height * scale;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            const base64 = canvas.toDataURL('image/jpeg', 0.7);
+            
+            fotosAdopcionNueva.push(base64);
+            container.innerHTML += `<div class="w-16 h-16 rounded-xl border overflow-hidden flex-shrink-0 shadow-sm"><img src="${base64}" class="w-full h-full object-cover"></div>`;
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    };
+
+    window.publicarDarEnAdopcion = async function(e) {
+      e.preventDefault();
+      document.getElementById('btn-publicar-adopcion').innerText = "Guardando...";
+      document.getElementById('btn-publicar-adopcion').disabled = true;
+
+      const nuevaAdopcion = {
+        estado: 'adopcion',
+        fotos: fotosAdopcionNueva,
+        nombre: document.getElementById('p_nombre').value,
+        especie: document.getElementById('p_especie').value,
+        raza: document.getElementById('p_raza').value,
+        edad: document.getElementById('p_edad').value,
+        plazo: document.getElementById('p_plazo').value,
+        estado_vzla: document.getElementById('p_estado_vzla').value,
+        ciudad: document.getElementById('p_ciudad_vzla').value,
+        direccion: document.getElementById('p_direccion').value,
+        contacto_nombre: document.getElementById('p_contacto_nombre').value,
+        contacto_tel: document.getElementById('p_contacto_tel').value,
+        contacto_email: document.getElementById('p_contacto_email').value,
+        fecha_publicacion: new Date().toISOString()
+      };
+
+      try {
+        await addDoc(collection(db, ...PATH_BASE, 'adopciones_publicas'), nuevaAdopcion);
+        e.target.reset();
+        document.getElementById('p_fotos_preview').innerHTML = '';
+        fotosAdopcionNueva = [];
+        window.cambiarVista('exito');
+      } catch (err) {
+        alert("Error publicando.");
+        console.error(err);
+      }
+      document.getElementById('btn-publicar-adopcion').innerText = "Publicar Mascota";
+      document.getElementById('btn-publicar-adopcion').disabled = false;
+    };
+
+    window.cargarFotoAdoptante = function(input) {
+      if (input.files && input.files[0]) {
+        const r = new FileReader();
+        r.onload = e => {
+          fotoAdoptanteBase64 = e.target.result;
+          document.getElementById('f_foto_preview').src = fotoAdoptanteBase64;
+          document.getElementById('f_foto_preview').classList.remove('hidden');
+          document.getElementById('f_foto_placeholder').classList.add('hidden');
+        }
+        r.readAsDataURL(input.files[0]);
+      }
+    };
+
+    window.prepararFormulario = function(id, source) {
+      const listado = source === 'publicas' ? baseAdopcionesPublicas : baseMascotas;
+      mascotaSeleccionada = listado.find(m => m.id === id);
+      
+      document.getElementById('form-mascota-img').src = mascotaSeleccionada.fotos?.[0] || '';
+      document.getElementById('form-mascota-nombre').innerText = mascotaSeleccionada.nombre;
+      document.getElementById('form-mascota-raza').innerText = mascotaSeleccionada.raza || 'Mestizo';
+      
+      let badgesInfo = [];
+      if(mascotaSeleccionada.vacunado) badgesInfo.push('<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded">Vacunado</span>');
+      if(mascotaSeleccionada.esterilizado) badgesInfo.push('<span class="bg-purple-100 text-purple-800 px-2 py-1 rounded">Esterilizado</span>');
+      document.getElementById('form-mascota-vet-info').innerHTML = badgesInfo.join('');
+      
+      document.getElementById('f_refugio').value = mascotaSeleccionada.refugio || (source === 'publicas' ? 'Adopción Particular' : 'Rescate General');
+      
+      window.cambiarVista('formulario');
+    };
+
+    window.enviarSolicitudAdopcion = async function(e) {
+      e.preventDefault();
+      const firma = document.getElementById('f_firma').value.trim().toLowerCase();
+      const nComp = `${document.getElementById('f_nombres').value} ${document.getElementById('f_apellidos').value}`.trim().toLowerCase();
+      
+      if (firma !== nComp) return alert("La firma final debe coincidir exactamente con sus Nombres y Apellidos.");
+
+      document.getElementById('btn-enviar-form').innerText = "PROCESANDO...";
+      document.getElementById('btn-enviar-form').disabled = true;
+
+      const solicitud = {
+        mascotaId: mascotaSeleccionada?.id,
+        mascotaNombre: mascotaSeleccionada?.nombre,
+        mascotaSource: mascotaSeleccionada?.source,
+        numeroUnico: 'ADOP-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
+        fecha: new Date().toISOString(),
+        estadoSolicitud: 'Pendiente',
+        refugioVinculado: mascotaSeleccionada?.refugio || 'General',
+        userId: user.uid,
+        adoptante: nComp,
+        cedula: document.getElementById('f_identificacion').value,
+        telefono: document.getElementById('f_tel1').value
+      };
+
+      try {
+        await addDoc(collection(db, ...PATH_BASE, 'solicitudes'), solicitud);
+        e.target.reset();
+        document.getElementById('f_foto_preview').classList.add('hidden');
+        document.getElementById('f_foto_placeholder').classList.remove('hidden');
+        window.cambiarVista('exito');
+      } catch (error) { alert("Error al guardar."); }
+      document.getElementById('btn-enviar-form').innerText = "ENVIAR SOLICITUD DEFINITIVA";
+      document.getElementById('btn-enviar-form').disabled = false;
+    };
+
+    window.intentarLoginAdmin = function() {
+      const pass = document.getElementById('admin-passcode').value;
+      if (pass === '.2411Patty..') {
+        adminRole = 'superadmin';
+        adminInfo = { org: 'SISTEMA CENTRAL' };
+        entrarAdmin();
+      } else {
+        const found = baseAdmins.find(a => a.pass === pass);
+        if (found) {
+          adminRole = found.role || 'refugio';
+          adminInfo = found;
+          entrarAdmin();
+        } else {
+          alert("Credenciales incorrectas.");
+        }
+      }
+    };
+
+    window.cerrarSesionAdmin = function() {
+      adminRole = null; adminInfo = null;
+      document.getElementById('admin-dashboard').classList.add('hidden');
+      document.getElementById('admin-login').classList.remove('hidden');
+    };
+
+    window.cambiarTabAdmin = function(tab) {
+      ['solicitudes', 'mascotas', 'config', 'voluntarios'].forEach(t => {
+        if(document.getElementById(`tab-${t}`)) document.getElementById(`tab-${t}`).classList.add('hidden');
+        if(document.getElementById(`tab-btn-${t}`)) document.getElementById(`tab-btn-${t}`).classList.replace('bg-orange-600', 'bg-slate-800');
+      });
+      document.getElementById(`tab-${tab}`).classList.remove('hidden');
+      document.getElementById(`tab-btn-${tab}`).classList.replace('bg-slate-800', 'bg-orange-600');
+    };
+
+    window.actEstadoSol = async function(id, estado) {
+      try { await updateDoc(doc(db, ...PATH_BASE, 'solicitudes', id), { estadoSolicitud: estado }); } catch (e) { alert("Error"); }
+    };
+
+    window.abrirModalEdicion = function(id, source) {
+      const modal = document.getElementById('modal-mascota');
+      const formResps = document.getElementById('e_responsable');
+      
+      formResps.innerHTML = '<option value="">Sin asignar</option>';
+      if(adminInfo && adminInfo.voluntarios) {
+        adminInfo.voluntarios.forEach(v => formResps.innerHTML += `<option value="${v}">${v}</option>`);
+      }
+
+      if(!id) {
+        document.getElementById('modal-mascota-titulo').innerText = "Añadir Mascota Interna";
+        document.getElementById('e_mascota_id').value = '';
+        document.getElementById('e_mascota_source').value = 'pets';
+        ['e_nombre', 'e_especie', 'e_raza', 'e_sexo', 'e_zona', 'e_responsable'].forEach(id => document.getElementById(id).value = '');
+        ['e_vacunado', 'e_esterilizado', 'e_desparasitado'].forEach(id => document.getElementById(id).checked = false);
+      } else {
+        document.getElementById('modal-mascota-titulo').innerText = "Editar Mascota";
+        const listado = source === 'publicas' ? baseAdopcionesPublicas : baseMascotas;
+        const m = listado.find(x => x.id === id);
+        
+        document.getElementById('e_mascota_id').value = m.id;
+        document.getElementById('e_mascota_source').value = source;
+        document.getElementById('e_nombre').value = m.nombre || '';
+        document.getElementById('e_especie').value = m.especie || '';
+        document.getElementById('e_raza').value = m.raza || '';
+        document.getElementById('e_sexo').value = m.sexo || '';
+        document.getElementById('e_estado').value = m.estado || 'adopcion';
+        document.getElementById('e_zona').value = m.zona || m.ciudad || '';
+        
+        document.getElementById('e_vacunado').checked = m.vacunado || false;
+        document.getElementById('e_esterilizado').checked = m.esterilizado || false;
+        document.getElementById('e_desparasitado').checked = m.desparasitado || false;
+        document.getElementById('e_responsable').value = m.responsable || '';
+      }
+      modal.classList.remove('hidden');
+    };
+
+    window.cerrarModalEdicion = () => document.getElementById('modal-mascota').classList.add('hidden');
+
+    window.guardarEdicionMascota = async function(e) {
+      e.preventDefault();
+      const id = document.getElementById('e_mascota_id').value;
+      const source = document.getElementById('e_mascota_source').value;
+      const colName = source === 'publicas' ? 'adopciones_publicas' : 'pets';
+      
+      const payload = {
+        nombre: document.getElementById('e_nombre').value,
+        especie: document.getElementById('e_especie').value,
+        raza: document.getElementById('e_raza').value,
+        sexo: document.getElementById('e_sexo').value,
+        estado: document.getElementById('e_estado').value,
+        zona: document.getElementById('e_zona').value,
+        vacunado: document.getElementById('e_vacunado').checked,
+        esterilizado: document.getElementById('e_esterilizado').checked,
+        desparasitado: document.getElementById('e_desparasitado').checked,
+        responsable: document.getElementById('e_responsable').value,
+        refugio: adminInfo.org 
+      };
+
+      try {
+        if(id) {
+          await updateDoc(doc(db, ...PATH_BASE, colName, id), payload);
+        } else {
+          await addDoc(collection(db, ...PATH_BASE, colName), payload);
+        }
+        window.cerrarModalEdicion();
+      } catch (err) { alert("Error guardando datos."); console.error(err); }
+    };
+
+    window.agregarVoluntario = async function() {
+      const nombre = document.getElementById('new_voluntario_nombre').value.trim();
+      if(!nombre || !adminInfo || adminRole !== 'refugio') return;
+      
+      const actuales = adminInfo.voluntarios || [];
+      const actualizados = [...actuales, nombre];
+      
+      try {
+        await updateDoc(doc(db, ...PATH_BASE, 'admins', adminInfo.id), { voluntarios: actualizados });
+        adminInfo.voluntarios = actualizados;
+        document.getElementById('new_voluntario_nombre').value = '';
+        renderizarListaVoluntarios();
+      } catch (e) { alert("Error"); }
+    };
 
     window.crearNuevoAdmin = async function(e) {
       e.preventDefault();
       try {
         await addDoc(collection(db, ...PATH_BASE, 'admins'), { 
           user: document.getElementById('new_admin_user').value, 
-          pass: document.getElementById('new_admin_pass').value 
+          pass: document.getElementById('new_admin_pass').value,
+          role: document.getElementById('new_admin_role').value,
+          org: document.getElementById('new_admin_org').value,
+          voluntarios: []
         });
-        document.getElementById('new_admin_user').value = '';
-        document.getElementById('new_admin_pass').value = '';
+        e.target.reset();
       } catch (e) { alert("Error creando admin"); }
-    }
+    };
 
     window.borrarAdmin = async function(id) {
-      if(confirm("¿Borrar admin?")) {
+      if(confirm("¿Borrar permanentemente?")) {
         try { await deleteDoc(doc(db, ...PATH_BASE, 'admins', id)); } catch(e) {}
       }
-    }
+    };
+
+    // ==============================================
+    // EJECUCIÓN INICIAL (Al final para garantizar que todo el scope existe)
+    // ==============================================
+    lucide.createIcons();
+    initMatrizVenezuela();
+    generarCheckboxesFormulario();
+    iniciarSlider();
+
+    signInAnonymously(auth).catch(err => console.error(err));
+
+    onAuthStateChanged(auth, (u) => {
+      user = u;
+      if (user) iniciarEscuchadores();
+    });
+
+    window.addEventListener('online', () => document.getElementById('offline-banner').classList.add('hidden'));
+    window.addEventListener('offline', () => document.getElementById('offline-banner').classList.remove('hidden'));
   </script>
 </body>
 </html>
