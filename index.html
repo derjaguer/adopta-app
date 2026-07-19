@@ -8,7 +8,7 @@
   <!-- ENLACES PWA -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#ea580c">
-  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2138/2138218.png">
+  <link class="rounded-full" rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2138/2138218.png">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -68,7 +68,6 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
 
-  <!-- -->
   <!-- Navegación -->
   <nav class="bg-orange-600 text-white shadow-md sticky top-0 z-50 print-hidden">
     <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
@@ -196,7 +195,6 @@
       </form>
     </div>
 
-    <!-- -->
     <!-- ============================================== -->
     <!-- VISTA 3: FORMULARIO DE SOLICITUD DE ADOPCIÓN -->
     <!-- ============================================== -->
@@ -244,7 +242,7 @@
         <section>
           <h2 class="font-bold text-2xl border-b-2 border-orange-200 pb-2 mb-6 flex items-center text-orange-800"><i data-lucide="user" class="w-6 h-6 mr-2"></i> 1. Datos del Adoptante</h2>
           
-          <!-- Bloque de Carga de Fotografías y Documentos -->
+          <!-- Bloque de Carga de Fotografías y Documentos Solicitados -->
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8 bg-slate-100 p-6 rounded-2xl border-2 border-dashed border-slate-200">
             
             <!-- Selfie -->
@@ -411,7 +409,6 @@
       <button onclick="cambiarVista('catalogo')" class="bg-orange-600 text-white px-8 py-3 rounded-xl font-bold shadow-md hover:bg-orange-700">Volver al Inicio</button>
     </div>
 
-    <!-- -->
     <!-- ============================================== -->
     <!-- VISTA 4: ADMIN / REFUGIOS -->
     <!-- ============================================== -->
@@ -518,7 +515,6 @@
     </div>
   </main>
 
-  <!-- -->
   <!-- ============================================== -->
   <!-- VISOR DETALLADO DE SOLICITUD (IMPRIMIBLE / PDF) -->
   <!-- ============================================== -->
@@ -721,7 +717,7 @@
   <!-- LÓGICA DE JAVASCRIPT -->
   <!-- ============================================== -->
   <script type="module">
-    //    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
     import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
     import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, enableIndexedDbPersistence } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
@@ -906,7 +902,7 @@
       if(adminInfo.voluntarios) renderizarListaVoluntarios();
     }
 
-    //    function renderizarAdminSolicitudes() {
+    function renderizarAdminSolicitudes() {
       const tb = document.getElementById('tabla-solicitudes');
       if (!tb) return;
       const sols = adminRole === 'superadmin' ? baseSolicitudes : baseSolicitudes.filter(s => s.refugioVinculado === adminInfo.org);
@@ -918,9 +914,9 @@
           <td class="p-3 font-bold text-slate-700">${s.mascotaNombre}</td>
           <td class="p-3"><span class="px-2 py-1 rounded text-[10px] font-bold ${s.estadoSolicitud === 'Aprobado' ? 'bg-green-100 text-green-800' : s.estadoSolicitud === 'Rechazado' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}">${s.estadoSolicitud}</span></td>
           <td class="p-3 flex items-center justify-center gap-2">
-            <button onclick="abrirDetalleSolicitud('${s.id}')" title="Ver Planilla Completa" class="bg-indigo-600 hover:bg-indigo-700 text-white p-2 rounded transition-colors"><i data-lucide="eye" class="w-4 h-4"></i></button>
-            <button onclick="actEstadoSol('${s.id}', 'Aprobado')" title="Aprobar Solicitud" class="bg-green-500 hover:bg-green-600 text-white p-2 rounded transition-colors"><i data-lucide="check" class="w-4 h-4"></i></button>
-            <button onclick="actEstadoSol('${s.id}', 'Rechazado')" title="Rechazar Solicitud" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+            <button onclick="abrirDetalleSolicitud('${s.id}')" title="Ver Planilla Completa" class="bg-indigo-600 hover:bg-indigo-700 text-white p-2 rounded transition-colors flex items-center justify-center"><i data-lucide="eye" class="w-4 h-4"></i></button>
+            <button onclick="actEstadoSol('${s.id}', 'Aprobado')" title="Aprobar Solicitud" class="bg-green-500 hover:bg-green-600 text-white p-2 rounded transition-colors flex items-center justify-center"><i data-lucide="check" class="w-4 h-4"></i></button>
+            <button onclick="actEstadoSol('${s.id}', 'Rechazado')" title="Rechazar Solicitud" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded transition-colors flex items-center justify-center"><i data-lucide="x" class="w-4 h-4"></i></button>
           </td>
         </tr>
       `).join('');
@@ -1000,7 +996,7 @@
       });
     }
 
-    //    window.procesarFotoEspecifica = async function(input, previewId, placeholderId, tipoDoc) {
+    window.procesarFotoEspecifica = async function(input, previewId, placeholderId, tipoDoc) {
       if (input.files && input.files[0]) {
         try {
           const base64 = await comprimirArchivo(input.files[0]);
@@ -1171,7 +1167,7 @@
       window.cambiarVista('formulario');
     };
 
-    //    window.enviarSolicitudAdopcion = async function(e) {
+    window.enviarSolicitudAdopcion = async function(e) {
       e.preventDefault();
       const firma = document.getElementById('f_firma').value.trim().toLowerCase();
       const nComp = `${document.getElementById('f_nombres').value} ${document.getElementById('f_apellidos').value}`.trim().toLowerCase();
@@ -1262,7 +1258,7 @@
       document.getElementById('btn-enviar-form').disabled = false;
     };
 
-    //    window.abrirDetalleSolicitud = function(id) {
+    window.abrirDetalleSolicitud = function(id) {
       const s = baseSolicitudes.find(item => item.id === id);
       if (!s) return;
 
