@@ -239,14 +239,14 @@
           </div>
         </section>
 
-        <!-- SECCIÓN 1: DATOS PERSONALES Y DOCUMENTACIÓN -->
+        <!-- SECCIÓN 1: DATOS PERSONALES Y DOCUMENTACIÓN (CON LOS 3 CAMPOS DE CARGA SOLICITADOS) -->
         <section>
           <h2 class="font-bold text-2xl border-b-2 border-orange-200 pb-2 mb-6 flex items-center text-orange-800"><i data-lucide="user" class="w-6 h-6 mr-2"></i> 1. Datos del Adoptante</h2>
           
           <!-- Bloque de Carga de Fotografías y Documentos Solicitados -->
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8 bg-slate-100 p-6 rounded-2xl border-2 border-dashed border-slate-200">
             
-            <!-- Selfie -->
+            <!-- Campo de carga 1: Foto Selfie del Adoptante -->
             <div class="flex flex-col items-center space-y-3">
               <label class="block text-xs font-extrabold text-slate-600 uppercase tracking-wider text-center">A. Foto del Adoptante (Selfie)</label>
               <div class="w-full h-40 bg-white rounded-xl flex flex-col items-center justify-center cursor-pointer relative overflow-hidden group shadow-sm hover:border-orange-500 border border-slate-300" onclick="document.getElementById('f_foto_input').click()">
@@ -259,7 +259,7 @@
               <input type="file" id="f_foto_input" accept="image/*" class="hidden" onchange="procesarFotoEspecifica(this, 'f_foto_preview', 'f_foto_placeholder', 'adoptante')">
             </div>
 
-            <!-- Cédula o Pasaporte -->
+            <!-- Campo de carga 2: Foto de Cédula o Pasaporte -->
             <div class="flex flex-col items-center space-y-3">
               <label class="block text-xs font-extrabold text-slate-600 uppercase tracking-wider text-center">B. Foto de Cédula o Pasaporte</label>
               <div class="w-full h-40 bg-white rounded-xl flex flex-col items-center justify-center cursor-pointer relative overflow-hidden group shadow-sm hover:border-orange-500 border border-slate-300" onclick="document.getElementById('f_cedula_input').click()">
@@ -272,7 +272,7 @@
               <input type="file" id="f_cedula_input" accept="image/*" class="hidden" onchange="procesarFotoEspecifica(this, 'f_cedula_preview', 'f_cedula_placeholder', 'cedula')">
             </div>
 
-            <!-- Registro de RIF -->
+            <!-- Campo de carga 3: Foto del RIF personal -->
             <div class="flex flex-col items-center space-y-3">
               <label class="block text-xs font-extrabold text-slate-600 uppercase tracking-wider text-center">C. Foto de RIF Vigente</label>
               <div class="w-full h-40 bg-white rounded-xl flex flex-col items-center justify-center cursor-pointer relative overflow-hidden group shadow-sm hover:border-orange-500 border border-slate-300" onclick="document.getElementById('f_riff_input').click()">
@@ -702,8 +702,8 @@
     </div>
   </div>
 
-  <!-- MODAL DE CONFIRMACIÓN O ALERTAS CUSTOM (Sustituye alert() / confirm()) -->
-  <div id="modal-alerta-custom" class="hidden fixed inset-0 bg-black/60 z-[150] flex justify-center items-center p-4">
+  <!-- MODAL DE CONFIRMACIÓN O ALERTAS CUSTOM (Sustituye alert() / confirm() de forma segura en iFrames) -->
+  <div id="modal-alerta-custom" class="hidden fixed inset-0 bg-black/60 z-[150] flex justify-center items-center p-4 font-sans">
     <div class="bg-white rounded-3xl p-6 max-w-sm w-full space-y-4 shadow-2xl text-center fade-in">
       <div id="alerta-custom-icono" class="w-16 h-16 mx-auto flex items-center justify-center rounded-full bg-orange-100 text-orange-600">
         <i data-lucide="info" class="w-8 h-8"></i>
@@ -771,7 +771,7 @@
     
     let mascotaSeleccionada = null;
     
-    // Almacenamiento de fotos en Base64
+    // Almacenamiento independiente de fotos en Base64 para adoptante
     let fotoAdoptanteBase64 = '';
     let fotoCedulaBase64 = '';
     let fotoRiffBase64 = '';
@@ -1502,7 +1502,7 @@
     };
 
     // ==============================================
-    // MANEJO DE ALERTAS PERSONALIZADAS (iFrame Safe)
+    // MANEJO DE ALERTAS PERSONALIZADAS
     // ==============================================
     window.mostrarAlertaCustom = function(titulo, mensaje, tipo = 'info') {
       const modal = document.getElementById('modal-alerta-custom');
