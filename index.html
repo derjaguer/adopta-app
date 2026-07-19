@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AdoptaPatitas - Sistema de Adopción Responsable</title>
   
-  <!-- ENLACES PWA (NUEVO) -->
+  <!-- ENLACES PWA -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#ea580c">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2138/2138218.png">
@@ -24,10 +24,40 @@
     }
     .input-custom:focus { outline: none; border-color: #f97316; box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2); background-color: white; }
     
+    /* Configuración de Impresión Inteligente para PDF */
     @media print {
-      .print-hidden { display: none !important; }
-      body { background-color: white; }
-      .print-shadow-none { box-shadow: none !important; border: 1px solid #e2e8f0; }
+      body {
+        background-color: white !important;
+        color: black !important;
+        font-size: 12px !important;
+      }
+      .print-hidden {
+        display: none !important;
+      }
+      .print-shadow-none {
+        box-shadow: none !important;
+        border: none !important;
+        background: transparent !important;
+      }
+      /* Ocultar todo el sitio principal excepto el modal de visualización detallada de solicitud */
+      body > *:not(#modal-detalle-solicitud-container) {
+        display: none !important;
+      }
+      #modal-detalle-solicitud-container {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+        display: block !important;
+        background: white !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .print-page-break {
+        page-break-inside: avoid;
+      }
     }
 
     /* Clases para el Slider */
@@ -38,27 +68,28 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
 
+  <!-- -->
   <!-- Navegación -->
-  <nav class="bg-orange-600 text-white p-4 shadow-md sticky top-0 z-50 print-hidden">
-    <div class="max-w-6xl mx-auto flex justify-between items-center flex-wrap gap-2">
-      <div class="flex items-center space-x-2 cursor-pointer" onclick="cambiarVista('catalogo')">
-        <i data-lucide="paw-print" class="w-6 h-6 text-orange-200"></i>
-        <span class="text-xl font-bold">AdoptaPatitas</span>
+  <nav class="bg-orange-600 text-white shadow-md sticky top-0 z-50 print-hidden">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center space-x-2 cursor-pointer shrink-0" onclick="cambiarVista('catalogo')">
+        <i data-lucide="paw-print" class="w-7 h-7 text-orange-200"></i>
+        <span class="text-2xl font-black tracking-tight">AdoptaPatitas</span>
       </div>
-      <div class="flex space-x-4">
-        <button onclick="cambiarVista('catalogo')" id="nav-catalogo" class="hover:text-orange-200 font-bold underline">Catálogo</button>
-        <button onclick="cambiarVista('dar-adopcion')" id="nav-dar-adopcion" class="hover:text-orange-200">Dar en Adopción</button>
-        <button onclick="cambiarVista('admin')" id="nav-admin" class="hover:text-orange-200">Refugios / Admin</button>
+      <div class="flex items-center gap-2 sm:gap-4 flex-wrap justify-center md:justify-end">
+        <button onclick="cambiarVista('catalogo')" id="nav-catalogo" class="px-3.5 py-2 rounded-lg text-sm font-bold hover:bg-orange-700 transition-colors">Catálogo</button>
+        <button onclick="cambiarVista('dar-adopcion')" id="nav-dar-adopcion" class="px-3.5 py-2 rounded-lg text-sm font-bold hover:bg-orange-700 transition-colors">Dar en Adopción</button>
+        <button onclick="cambiarVista('admin')" id="nav-admin" class="px-3.5 py-2 rounded-lg text-sm font-bold bg-orange-700 hover:bg-orange-800 transition-colors">Refugios / Admin</button>
       </div>
     </div>
   </nav>
 
   <!-- Indicador de conexión -->
-  <div id="offline-banner" class="hidden bg-yellow-500 text-white text-center py-1 text-sm font-semibold print-hidden flex justify-center items-center">
-    <i data-lucide="alert-circle" class="w-4 h-4 mr-2"></i> Estás en modo Offline. Puedes seguir guardando, se sincronizará luego.
+  <div id="offline-banner" class="hidden bg-yellow-500 text-white text-center py-1.5 text-sm font-semibold print-hidden flex justify-center items-center">
+    <i data-lucide="alert-circle" class="w-4 h-4 mr-2 animate-bounce"></i> Estás en modo Offline. Puedes seguir guardando, se sincronizará luego.
   </div>
 
-  <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-8">
+  <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-8 print-hidden">
 
     <!-- ============================================== -->
     <!-- VISTA 1: CATÁLOGO DE ADOPCIONES -->
@@ -165,17 +196,15 @@
       </form>
     </div>
 
+    <!-- -->
     <!-- ============================================== -->
-    <!-- VISTA 3: FORMULARIO DE SOLICITUD DE ADOPCIÓN (EXISTENTE) -->
+    <!-- VISTA 3: FORMULARIO DE SOLICITUD DE ADOPCIÓN -->
     <!-- ============================================== -->
-    <div id="vista-formulario" class="hidden fade-in bg-white p-4 md:p-8 rounded-2xl shadow-lg print-shadow-none">
+    <div id="vista-formulario" class="hidden fade-in bg-white p-4 md:p-8 rounded-2xl shadow-lg">
       
-      <div class="print-hidden flex justify-between mb-6 sticky top-16 z-40 bg-white/90 backdrop-blur-sm p-4 border-b rounded-t-xl">
+      <div class="flex justify-between mb-6 sticky top-16 z-40 bg-white/90 backdrop-blur-sm p-4 border-b rounded-t-xl">
         <button onclick="cambiarVista('catalogo')" class="text-slate-600 hover:text-black flex items-center font-semibold bg-slate-100 px-4 py-2 rounded-lg">
           <i data-lucide="x-circle" class="w-5 h-5 mr-2"></i> Cancelar
-        </button>
-        <button onclick="window.print()" class="bg-slate-800 text-white px-4 py-2 rounded-lg flex items-center font-semibold shadow-md">
-          <i data-lucide="printer" class="w-5 h-5 mr-2"></i> Imprimir / PDF
         </button>
       </div>
 
@@ -191,8 +220,6 @@
           <h2 class="text-sm font-bold text-orange-800 uppercase tracking-widest">Estás solicitando adoptar a:</h2>
           <h3 id="form-mascota-nombre" class="text-3xl font-black text-slate-900">Nombre</h3>
           <p class="text-slate-600 mt-1"><span class="font-semibold">Raza/Tipo:</span> <span id="form-mascota-raza"></span></p>
-          
-          <!-- Datos Veterinarios Extra -->
           <div id="form-mascota-vet-info" class="mt-3 flex flex-wrap gap-2 text-xs font-bold"></div>
         </div>
       </div>
@@ -213,55 +240,86 @@
           </div>
         </section>
 
-        <!-- SECCIÓN 1: DATOS PERSONALES -->
+        <!-- SECCIÓN 1: DATOS PERSONALES Y DOCUMENTACIÓN -->
         <section>
           <h2 class="font-bold text-2xl border-b-2 border-orange-200 pb-2 mb-6 flex items-center text-orange-800"><i data-lucide="user" class="w-6 h-6 mr-2"></i> 1. Datos del Adoptante</h2>
-          <div class="flex flex-col md:flex-row gap-8 mb-6">
+          
+          <!-- Bloque de Carga de Fotografías y Documentos -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8 bg-slate-100 p-6 rounded-2xl border-2 border-dashed border-slate-200">
             
-            <div class="flex flex-col items-center space-y-3 shrink-0">
-              <label class="block text-xs font-bold text-slate-500 uppercase">Foto (Selfie/ID)</label>
-              <div class="w-32 h-40 bg-slate-100 border-2 border-dashed border-slate-300 rounded-xl flex items-center justify-center cursor-pointer relative overflow-hidden group" onclick="document.getElementById('f_foto_input').click()">
+            <!-- Selfie -->
+            <div class="flex flex-col items-center space-y-3">
+              <label class="block text-xs font-extrabold text-slate-600 uppercase tracking-wider text-center">A. Foto del Adoptante (Selfie)</label>
+              <div class="w-full h-40 bg-white rounded-xl flex flex-col items-center justify-center cursor-pointer relative overflow-hidden group shadow-sm hover:border-orange-500 border border-slate-300" onclick="document.getElementById('f_foto_input').click()">
                 <img id="f_foto_preview" src="" class="hidden w-full h-full object-cover">
                 <div id="f_foto_placeholder" class="text-center p-2 text-slate-400 group-hover:text-orange-500 transition-colors">
                   <i data-lucide="camera" class="w-8 h-8 mx-auto mb-1"></i>
-                  <span class="text-[10px] font-bold">Tomar Foto</span>
+                  <span class="text-[10px] font-bold">Cargar Foto / Selfie</span>
                 </div>
               </div>
-              <input type="file" id="f_foto_input" accept="image/*" capture="user" class="hidden" onchange="cargarFotoAdoptante(this)">
+              <input type="file" id="f_foto_input" accept="image/*" class="hidden" onchange="procesarFotoEspecifica(this, 'f_foto_preview', 'f_foto_placeholder', 'adoptante')">
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-grow">
-              <div class="md:col-span-2"><label class="block text-xs font-bold text-slate-500 mb-1">Nº Identificación</label><input required type="text" id="f_identificacion" class="input-custom"></div>
-              <div><label class="block text-xs font-bold text-slate-500 mb-1">Nombres</label><input required type="text" id="f_nombres" class="input-custom"></div>
-              <div><label class="block text-xs font-bold text-slate-500 mb-1">Apellidos</label><input required type="text" id="f_apellidos" class="input-custom"></div>
-              
-              <div>
-                <label class="block text-xs font-bold text-slate-500 mb-1">Estado</label>
-                <select id="f_estado" onchange="actualizarCiudades()" class="input-custom bg-white font-semibold text-orange-800"></select>
+            <!-- Cédula o Pasaporte -->
+            <div class="flex flex-col items-center space-y-3">
+              <label class="block text-xs font-extrabold text-slate-600 uppercase tracking-wider text-center">B. Foto de Cédula o Pasaporte</label>
+              <div class="w-full h-40 bg-white rounded-xl flex flex-col items-center justify-center cursor-pointer relative overflow-hidden group shadow-sm hover:border-orange-500 border border-slate-300" onclick="document.getElementById('f_cedula_input').click()">
+                <img id="f_cedula_preview" src="" class="hidden w-full h-full object-cover">
+                <div id="f_cedula_placeholder" class="text-center p-2 text-slate-400 group-hover:text-orange-500 transition-colors">
+                  <i data-lucide="file-text" class="w-8 h-8 mx-auto mb-1"></i>
+                  <span class="text-[10px] font-bold">Cargar Cédula / Pasaporte</span>
+                </div>
               </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-500 mb-1">Ciudad / Municipio</label>
-                <select id="f_ciudad" class="input-custom bg-white"></select>
-              </div>
+              <input type="file" id="f_cedula_input" accept="image/*" class="hidden" onchange="procesarFotoEspecifica(this, 'f_cedula_preview', 'f_cedula_placeholder', 'cedula')">
+            </div>
 
-              <div class="md:col-span-2"><label class="block text-xs font-bold text-slate-500 mb-1">Dirección Exacta</label><textarea required id="f_direccion" class="input-custom" rows="2"></textarea></div>
-              
-              <div>
-                <label class="block text-xs font-bold text-slate-500 mb-1">Situación de Vivienda</label>
-                <select id="f_estadoCasa" onchange="toggleArrendamiento()" class="input-custom bg-white"><option>Propia</option><option>Arrendamiento</option><option>Temporal</option></select>
+            <!-- Registro de RIF -->
+            <div class="flex flex-col items-center space-y-3">
+              <label class="block text-xs font-extrabold text-slate-600 uppercase tracking-wider text-center">C. Foto de RIF Vigente</label>
+              <div class="w-full h-40 bg-white rounded-xl flex flex-col items-center justify-center cursor-pointer relative overflow-hidden group shadow-sm hover:border-orange-500 border border-slate-300" onclick="document.getElementById('f_riff_input').click()">
+                <img id="f_riff_preview" src="" class="hidden w-full h-full object-cover">
+                <div id="f_riff_placeholder" class="text-center p-2 text-slate-400 group-hover:text-orange-500 transition-colors">
+                  <i data-lucide="file-check" class="w-8 h-8 mx-auto mb-1"></i>
+                  <span class="text-[10px] font-bold">Cargar Foto del RIF</span>
+                </div>
               </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-500 mb-1">Estado Civil</label>
-                <select id="f_estadoCivil" onchange="togglePareja()" class="input-custom bg-white"><option>Soltero(a)</option><option>Noviazgo</option><option>Casado(a)</option><option>Concubinato</option><option>Divorciado(a)</option><option>Viudo(a)</option></select>
-              </div>
+              <input type="file" id="f_riff_input" accept="image/*" class="hidden" onchange="procesarFotoEspecifica(this, 'f_riff_preview', 'f_riff_placeholder', 'riff')">
+            </div>
 
-              <div><label class="block text-xs font-bold text-slate-500 mb-1">Teléfono Principal</label><input required type="tel" id="f_tel1" class="input-custom"></div>
-              <div><label class="block text-xs font-bold text-slate-500 mb-1">Teléfono Secundario</label><input type="tel" id="f_tel2" class="input-custom"></div>
+          </div>
 
-              <div id="bloque_pareja" class="hidden md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-orange-50 rounded-xl border border-orange-100">
-                <div><label class="block text-xs font-bold text-orange-800 mb-1">Nombre de la Pareja</label><input type="text" id="f_parejaNombre" class="input-custom bg-white"></div>
-                <div><label class="block text-xs font-bold text-orange-800 mb-1">Teléfono Pareja</label><input type="tel" id="f_parejaTel" class="input-custom bg-white"></div>
-              </div>
+          <!-- Campos de texto principales -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="md:col-span-2"><label class="block text-xs font-bold text-slate-500 mb-1">Nº Cédula o Identificación</label><input required type="text" id="f_identificacion" class="input-custom"></div>
+            <div><label class="block text-xs font-bold text-slate-500 mb-1">Nombres</label><input required type="text" id="f_nombres" class="input-custom"></div>
+            <div><label class="block text-xs font-bold text-slate-500 mb-1">Apellidos</label><input required type="text" id="f_apellidos" class="input-custom"></div>
+            
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">Estado</label>
+              <select id="f_estado" onchange="actualizarCiudades()" class="input-custom bg-white font-semibold text-orange-800"></select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">Ciudad / Municipio</label>
+              <select id="f_ciudad" class="input-custom bg-white"></select>
+            </div>
+
+            <div class="md:col-span-2"><label class="block text-xs font-bold text-slate-500 mb-1">Dirección Exacta</label><textarea required id="f_direccion" class="input-custom" rows="2"></textarea></div>
+            
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">Situación de Vivienda</label>
+              <select id="f_estadoCasa" onchange="toggleArrendamiento()" class="input-custom bg-white"><option>Propia</option><option>Arrendamiento</option><option>Temporal</option></select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">Estado Civil</label>
+              <select id="f_estadoCivil" onchange="togglePareja()" class="input-custom bg-white"><option>Soltero(a)</option><option>Noviazgo</option><option>Casado(a)</option><option>Concubinato</option><option>Divorciado(a)</option><option>Viudo(a)</option></select>
+            </div>
+
+            <div><label class="block text-xs font-bold text-slate-500 mb-1">Teléfono Principal</label><input required type="tel" id="f_tel1" class="input-custom"></div>
+            <div><label class="block text-xs font-bold text-slate-500 mb-1">Teléfono Secundario</label><input type="tel" id="f_tel2" class="input-custom"></div>
+
+            <div id="bloque_pareja" class="hidden md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-orange-50 rounded-xl border border-orange-100">
+              <div><label class="block text-xs font-bold text-orange-800 mb-1">Nombre de la Pareja</label><input type="text" id="f_parejaNombre" class="input-custom bg-white"></div>
+              <div><label class="block text-xs font-bold text-orange-800 mb-1">Teléfono Pareja</label><input type="tel" id="f_parejaTel" class="input-custom bg-white"></div>
             </div>
           </div>
         </section>
@@ -322,22 +380,22 @@
         </section>
 
         <!-- SECCIÓN 4: DECLARACIÓN JURADA -->
-        <section class="bg-slate-800 p-8 rounded-2xl text-white shadow-lg print-shadow-none print:bg-white print:text-black">
-          <h2 class="font-black text-2xl border-b border-slate-600 pb-3 mb-6 flex items-center text-orange-400 print:text-black"><i data-lucide="alert-circle" class="w-6 h-6 mr-2"></i> 4. Declaración Jurada</h2>
+        <section class="bg-slate-800 p-8 rounded-2xl text-white shadow-lg">
+          <h2 class="font-black text-2xl border-b border-slate-600 pb-3 mb-6 flex items-center text-orange-400"><i data-lucide="alert-circle" class="w-6 h-6 mr-2"></i> 4. Declaración Jurada</h2>
           <div class="space-y-4" id="legales-group">
             <!-- Checkboxes legales inyectados por JS -->
           </div>
 
-          <div class="mt-10 pt-8 border-t-2 border-dashed border-slate-600 print:border-gray-400">
-            <p class="text-sm mb-4 text-orange-200 font-medium print:text-black">Para firmar electrónicamente, escriba su Nombre y Apellido exactamente igual.</p>
+          <div class="mt-10 pt-8 border-t-2 border-dashed border-slate-600">
+            <p class="text-sm mb-4 text-orange-200 font-medium">Para firmar electrónicamente, escriba su Nombre y Apellido exactamente igual.</p>
             <div class="flex flex-col md:flex-row items-center gap-4">
               <label class="font-black text-xl">FIRMA ELECTRÓNICA:</label>
-              <input required type="text" id="f_firma" placeholder="Ej: Juan Perez" class="w-full p-3 border-b-4 border-orange-500 bg-transparent text-center font-serif text-2xl focus:outline-none focus:bg-slate-700 transition-colors print:text-black">
+              <input required type="text" id="f_firma" placeholder="Ej: Juan Perez" class="w-full p-3 border-b-4 border-orange-500 bg-transparent text-center font-serif text-2xl focus:outline-none focus:bg-slate-700 transition-colors">
             </div>
           </div>
         </section>
 
-        <div class="print-hidden text-center pt-6">
+        <div class="text-center pt-6">
           <button type="submit" id="btn-enviar-form" class="bg-orange-600 hover:bg-orange-700 text-white text-xl font-black py-5 px-16 rounded-full shadow-lg transition-transform transform hover:scale-105 w-full md:w-auto">
             ENVIAR SOLICITUD DEFINITIVA
           </button>
@@ -353,6 +411,7 @@
       <button onclick="cambiarVista('catalogo')" class="bg-orange-600 text-white px-8 py-3 rounded-xl font-bold shadow-md hover:bg-orange-700">Volver al Inicio</button>
     </div>
 
+    <!-- -->
     <!-- ============================================== -->
     <!-- VISTA 4: ADMIN / REFUGIOS -->
     <!-- ============================================== -->
@@ -391,7 +450,11 @@
             <table class="w-full text-left border-collapse text-sm">
               <thead>
                 <tr class="bg-slate-100 text-slate-600 uppercase text-xs">
-                  <th class="p-3 border-b">Planilla</th><th class="p-3 border-b">Adoptante</th><th class="p-3 border-b">Mascota</th><th class="p-3 border-b">Estado</th><th class="p-3 border-b">Decisión</th>
+                  <th class="p-3 border-b">Planilla ID</th>
+                  <th class="p-3 border-b">Adoptante</th>
+                  <th class="p-3 border-b">Mascota</th>
+                  <th class="p-3 border-b">Estado</th>
+                  <th class="p-3 border-b text-center">Acciones</th>
                 </tr>
               </thead>
               <tbody id="tabla-solicitudes"></tbody>
@@ -455,6 +518,149 @@
     </div>
   </main>
 
+  <!-- -->
+  <!-- ============================================== -->
+  <!-- VISOR DETALLADO DE SOLICITUD (IMPRIMIBLE / PDF) -->
+  <!-- ============================================== -->
+  <div id="modal-detalle-solicitud-container" class="hidden fixed inset-0 bg-black/60 z-[120] flex justify-center items-center p-0 md:p-4 overflow-y-auto">
+    <div class="bg-white w-full max-w-4xl rounded-none md:rounded-3xl shadow-2xl p-6 md:p-10 relative flex flex-col my-0 md:my-6 print-shadow-none print:p-0">
+      
+      <!-- Controles de cabecera -->
+      <div class="print-hidden flex justify-between items-center mb-8 bg-slate-100 p-4 rounded-xl border">
+        <button onclick="cerrarDetalleSolicitud()" class="bg-slate-600 hover:bg-slate-700 text-white font-bold px-4 py-2 rounded-lg text-xs flex items-center transition-colors">
+          <i data-lucide="arrow-left" class="w-4 h-4 mr-1.5"></i> Volver al Panel
+        </button>
+        <div class="flex items-center gap-2">
+          <button onclick="window.print()" class="bg-orange-600 hover:bg-orange-700 text-white font-black px-5 py-2.5 rounded-lg text-xs flex items-center shadow transition-all">
+            <i data-lucide="printer" class="w-4 h-4 mr-1.5"></i> IMPRIMIR PLANILLA (PDF)
+          </button>
+          <button onclick="cerrarDetalleSolicitud()" class="text-slate-400 hover:text-slate-600 p-1">
+            <i data-lucide="x" class="w-6 h-6"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Cabecera Oficial Planilla -->
+      <div class="text-center mb-8 pb-6 border-b-4 border-double border-orange-500">
+        <h1 class="text-2xl md:text-3xl font-black uppercase text-slate-900 tracking-wider">Planilla de Adopción Registrada</h1>
+        <p class="text-xs font-bold text-orange-600 uppercase tracking-widest mt-1">Expediente de Tenencia Responsable y Evaluación de Hogar</p>
+        <div class="flex justify-center gap-4 mt-3 text-xs text-slate-500 font-mono">
+          <span>ID: <strong id="print-solicitud-id" class="text-slate-800"></strong></span>
+          <span>Fecha: <strong id="print-solicitud-fecha" class="text-slate-800"></strong></span>
+        </div>
+      </div>
+
+      <!-- Cuerpo de la solicitud estructurada para lectura e impresión -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        <!-- Bloque Izquierdo: Datos Personales e Imágenes -->
+        <div class="md:col-span-1 space-y-6">
+          <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+            <h3 class="font-extrabold text-sm uppercase text-orange-600 border-b pb-2 mb-4 flex items-center">
+              <i data-lucide="user" class="w-4 h-4 mr-1.5"></i> Documentos del Solicitante
+            </h3>
+            
+            <div class="space-y-4">
+              <!-- Foto Selfie -->
+              <div>
+                <span class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Adoptante (Selfie / ID):</span>
+                <div class="aspect-[3/4] w-full bg-slate-100 rounded-lg overflow-hidden border">
+                  <img id="print-foto-adoptante" class="w-full h-full object-cover" src="">
+                </div>
+              </div>
+              <!-- Cédula -->
+              <div>
+                <span class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Cédula o Pasaporte:</span>
+                <div class="aspect-video w-full bg-slate-100 rounded-lg overflow-hidden border">
+                  <img id="print-foto-cedula" class="w-full h-full object-cover" src="">
+                </div>
+              </div>
+              <!-- RIFF -->
+              <div>
+                <span class="block text-[10px] font-bold text-slate-500 uppercase mb-1">RIFF Vigente:</span>
+                <div class="aspect-video w-full bg-slate-100 rounded-lg overflow-hidden border">
+                  <img id="print-foto-riff" class="w-full h-full object-cover" src="">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bloque Derecho: Información detallada de Entrevista y Compromisos -->
+        <div class="md:col-span-2 space-y-6">
+          
+          <!-- Datos Personales -->
+          <div class="bg-white rounded-2xl border p-5">
+            <h3 class="font-bold text-base text-slate-900 border-b pb-2 mb-4 uppercase">1. Información del Solicitante</h3>
+            <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+              <div><span class="text-slate-400 font-medium block">Nombres y Apellidos:</span><strong id="print-nombres-completos" class="text-slate-900"></strong></div>
+              <div><span class="text-slate-400 font-medium block">Cédula / Identificación:</span><strong id="print-cedula-id" class="text-slate-900"></strong></div>
+              <div><span class="text-slate-400 font-medium block">Ubicación:</span><strong id="print-ubicacion" class="text-slate-900"></strong></div>
+              <div><span class="text-slate-400 font-medium block">Dirección:</span><strong id="print-direccion" class="text-slate-900"></strong></div>
+              <div><span class="text-slate-400 font-medium block">Teléfono Principal:</span><strong id="print-telefono" class="text-slate-900"></strong></div>
+              <div><span class="text-slate-400 font-medium block">Teléfono Secundario:</span><strong id="print-telefono-secundario" class="text-slate-900"></strong></div>
+              <div><span class="text-slate-400 font-medium block">Vivienda:</span><strong id="print-vivienda" class="text-slate-900"></strong></div>
+              <div><span class="text-slate-400 font-medium block">Estado Civil:</span><strong id="print-estado-civil" class="text-slate-900"></strong></div>
+              <div id="print-pareja-wrapper" class="col-span-2 mt-2 bg-orange-50 p-3 rounded-lg border border-orange-100 hidden">
+                <span class="text-orange-800 font-bold text-xs uppercase block">Pareja o Copropietario:</span>
+                <span class="text-slate-700 text-xs" id="print-pareja-detalles"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Entrevista -->
+          <div class="bg-white rounded-2xl border p-5 print-page-break">
+            <h3 class="font-bold text-base text-slate-900 border-b pb-2 mb-4 uppercase">2. Respuestas de la Entrevista</h3>
+            <div class="space-y-3 text-sm">
+              <div>
+                <span class="text-slate-500 font-semibold">¿Por qué deseas adoptar?</span>
+                <p id="print-q1" class="text-slate-800 italic mt-0.5 pl-3 border-l-2"></p>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div><span class="text-slate-500 font-semibold">¿Tiene mascotas actualmente?:</span> <strong id="print-q2"></strong></div>
+                <div><span class="text-slate-500 font-semibold">¿Están esterilizadas?:</span> <strong id="print-q4"></strong></div>
+                <div><span class="text-slate-500 font-semibold">¿Cuántas personas conviven?:</span> <strong id="print-q5"></strong></div>
+                <div><span class="text-slate-500 font-semibold">¿Todos de acuerdo?:</span> <strong id="print-q6"></strong></div>
+              </div>
+              <div id="print-arrendador-wrapper" class="bg-yellow-50 p-3 rounded-lg border hidden text-xs">
+                <span class="font-bold text-yellow-800 uppercase block">Detalles de Alquiler:</span>
+                <span id="print-arrendador-info"></span>
+              </div>
+              <div>
+                <span class="text-slate-500 font-semibold">¿Si se muda, qué pasaría con la mascota?</span>
+                <p id="print-q10" class="text-slate-800 italic mt-0.5 pl-3 border-l-2"></p>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div><span class="text-slate-500 font-semibold">¿Espacio exterior seguro?:</span> <strong id="print-q15"></strong></div>
+                <div><span class="text-slate-500 font-semibold">Horas sola al día:</span> <strong id="print-q17"></strong></div>
+              </div>
+              <div><span class="text-slate-500 font-semibold">Presupuesto mensual est. para manutención:</span> <strong id="print-q20"></strong></div>
+            </div>
+          </div>
+
+          <!-- Compromisos y Firma -->
+          <div class="bg-white rounded-2xl border p-5 print-page-break">
+            <h3 class="font-bold text-base text-slate-900 border-b pb-2 mb-4 uppercase">3. Compromisos y Firma</h3>
+            <div class="text-sm space-y-4">
+              <div>
+                <span class="text-slate-500 font-semibold">Garantías de Bienestar Aseguradas:</span>
+                <div class="flex flex-wrap gap-1.5 mt-2" id="print-comodidades-tags"></div>
+              </div>
+              <div><span class="text-slate-500 font-semibold">¿Se compromete a esterilizar?:</span> <strong id="print-q24"></strong></div>
+              <div class="border-t-2 border-dashed pt-4 mt-4 text-center">
+                <span class="text-slate-400 text-xs uppercase block tracking-wider font-bold">Firma Digital Jurada</span>
+                <span id="print-firma" class="font-serif text-3xl text-orange-600 italic block mt-1"></span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
   <!-- MODAL EDITAR / CREAR MASCOTA ADMIN -->
   <div id="modal-mascota" class="hidden fixed inset-0 bg-black/60 z-[60] flex justify-center items-center p-4">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto relative">
@@ -499,12 +705,23 @@
     </div>
   </div>
 
+  <!-- MODAL DE CONFIRMACIÓN O ALERTAS CUSTOM (Sustituye alert() / confirm()) -->
+  <div id="modal-alerta-custom" class="hidden fixed inset-0 bg-black/60 z-[150] flex justify-center items-center p-4">
+    <div class="bg-white rounded-3xl p-6 max-w-sm w-full space-y-4 shadow-2xl text-center fade-in">
+      <div id="alerta-custom-icono" class="w-16 h-16 mx-auto flex items-center justify-center rounded-full bg-orange-100 text-orange-600">
+        <i data-lucide="info" class="w-8 h-8"></i>
+      </div>
+      <h3 id="alerta-custom-titulo" class="text-lg font-black text-slate-900">Mensaje de Alerta</h3>
+      <p id="alerta-custom-mensaje" class="text-sm text-slate-500">Contenido del mensaje...</p>
+      <button onclick="cerrarAlertaCustom()" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-sm transition-all">Aceptar</button>
+    </div>
+  </div>
+
   <!-- ============================================== -->
   <!-- LÓGICA DE JAVASCRIPT -->
   <!-- ============================================== -->
   <script type="module">
-    // IMPORTACIÓN ACTUALIZADA: INCLUYE enableIndexedDbPersistence
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+    //    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
     import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
     import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, enableIndexedDbPersistence } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
@@ -556,7 +773,12 @@
     let baseAdmins = [];
     
     let mascotaSeleccionada = null;
+    
+    // Almacenamiento de fotos en Base64
     let fotoAdoptanteBase64 = '';
+    let fotoCedulaBase64 = '';
+    let fotoRiffBase64 = '';
+    
     let fotosAdopcionNueva = [];
     
     let adminRole = null;
@@ -590,15 +812,18 @@
     function iniciarSlider() {
       let currentSlide = 0;
       setInterval(() => {
-        document.getElementById(`slide-${currentSlide}`).classList.replace('slide-active', 'slide-hidden');
+        const slideActual = document.getElementById(`slide-${currentSlide}`);
+        if (slideActual) slideActual.classList.replace('slide-active', 'slide-hidden');
         currentSlide = (currentSlide + 1) % 3;
-        document.getElementById(`slide-${currentSlide}`).classList.replace('slide-hidden', 'slide-active');
+        const siguienteSlide = document.getElementById(`slide-${currentSlide}`);
+        if (siguienteSlide) siguienteSlide.classList.replace('slide-hidden', 'slide-active');
       }, 5000);
     }
 
     function renderizarCatalogo() {
       const grid = document.getElementById('catalogo-grid');
       const empty = document.getElementById('catalogo-vacio');
+      if (!grid || !empty) return;
       grid.innerHTML = '';
       
       const enAdopcionRescate = baseMascotas.filter(m => m.estado === 'adopcion');
@@ -636,6 +861,7 @@
     function initMatrizVenezuela() {
       const s1 = document.getElementById('f_estado');
       const s2 = document.getElementById('p_estado_vzla');
+      if (!s1 || !s2) return;
       Object.keys(VENEZUELA).sort().forEach(est => {
         s1.add(new Option(est, est));
         s2.add(new Option(est, est));
@@ -647,10 +873,16 @@
     function generarCheckboxesFormulario() {
       const comodidades = ['Visitas al Veterinario', 'Vacunas y Vitaminas', 'Paseos Diarios', 'Collar Identificación', 'Agua Fresca', 'Alimento propio', 'Desparasitación', 'Baño Semanal', 'Área Limpia'];
       const cg = document.getElementById('checkbox-group');
-      comodidades.forEach((c, i) => cg.innerHTML += `<label class="flex items-center space-x-3"><input type="checkbox" id="c_comodidad_${i}" class="w-5 h-5 text-orange-600"><span class="font-medium text-sm">${c}</span></label>`);
+      if (cg) {
+        cg.innerHTML = '';
+        comodidades.forEach((c, i) => cg.innerHTML += `<label class="flex items-center space-x-3"><input type="checkbox" id="c_comodidad_${i}" class="w-5 h-5 text-orange-600"><span class="font-medium text-sm">${c}</span></label>`);
+      }
       const legales = ['Visitas de control sorpresa.', 'Entiendo responsabilidades físicas/económicas.', 'Acepto sin reservas condiciones.', 'Penas legales por maltrato animal.', 'Información es 100% real.'];
       const lg = document.getElementById('legales-group');
-      legales.forEach((l, i) => lg.innerHTML += `<label class="flex items-start space-x-4"><input required type="checkbox" id="c_legal_${i}" class="w-6 h-6 mt-0.5 text-orange-500 rounded"><span class="text-sm font-medium leading-tight">${l}</span></label>`);
+      if (lg) {
+        lg.innerHTML = '';
+        legales.forEach((l, i) => lg.innerHTML += `<label class="flex items-start space-x-4"><input required type="checkbox" id="c_legal_${i}" class="w-6 h-6 mt-0.5 text-orange-500 rounded"><span class="text-sm font-medium leading-tight">${l}</span></label>`);
+      }
     }
 
     function entrarAdmin() {
@@ -674,19 +906,21 @@
       if(adminInfo.voluntarios) renderizarListaVoluntarios();
     }
 
-    function renderizarAdminSolicitudes() {
+    //    function renderizarAdminSolicitudes() {
       const tb = document.getElementById('tabla-solicitudes');
+      if (!tb) return;
       const sols = adminRole === 'superadmin' ? baseSolicitudes : baseSolicitudes.filter(s => s.refugioVinculado === adminInfo.org);
       
       tb.innerHTML = sols.map(s => `
         <tr class="border-b hover:bg-slate-50">
-          <td class="p-3 font-mono text-xs">${s.numeroUnico}</td>
-          <td class="p-3"><b>${s.adoptante}</b><br><span class="text-xs text-orange-600">${s.telefono}</span></td>
-          <td class="p-3 font-bold">${s.mascotaNombre}</td>
-          <td class="p-3"><span class="px-2 py-1 rounded text-[10px] font-bold ${s.estadoSolicitud === 'Aprobado' ? 'bg-green-100 text-green-800' : s.estadoSolicitud === 'Rechazado' ? 'bg-red-100 text-red-800' : 'bg-yellow-100'}">${s.estadoSolicitud}</span></td>
-          <td class="p-3 flex gap-2">
-            <button onclick="actEstadoSol('${s.id}', 'Aprobado')" class="bg-green-500 text-white p-2 rounded"><i data-lucide="check-circle" class="w-4 h-4"></i></button>
-            <button onclick="actEstadoSol('${s.id}', 'Rechazado')" class="bg-red-500 text-white p-2 rounded"><i data-lucide="x-circle" class="w-4 h-4"></i></button>
+          <td class="p-3 font-mono text-xs font-bold text-orange-600">${s.numeroUnico}</td>
+          <td class="p-3"><b>${s.adoptante}</b><br><span class="text-xs text-slate-500">C.I: ${s.cedula || 'N/E'}</span></td>
+          <td class="p-3 font-bold text-slate-700">${s.mascotaNombre}</td>
+          <td class="p-3"><span class="px-2 py-1 rounded text-[10px] font-bold ${s.estadoSolicitud === 'Aprobado' ? 'bg-green-100 text-green-800' : s.estadoSolicitud === 'Rechazado' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}">${s.estadoSolicitud}</span></td>
+          <td class="p-3 flex items-center justify-center gap-2">
+            <button onclick="abrirDetalleSolicitud('${s.id}')" title="Ver Planilla Completa" class="bg-indigo-600 hover:bg-indigo-700 text-white p-2 rounded transition-colors"><i data-lucide="eye" class="w-4 h-4"></i></button>
+            <button onclick="actEstadoSol('${s.id}', 'Aprobado')" title="Aprobar Solicitud" class="bg-green-500 hover:bg-green-600 text-white p-2 rounded transition-colors"><i data-lucide="check" class="w-4 h-4"></i></button>
+            <button onclick="actEstadoSol('${s.id}', 'Rechazado')" title="Rechazar Solicitud" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
           </td>
         </tr>
       `).join('');
@@ -695,6 +929,7 @@
 
     function renderizarAdminMascotas() {
       const tb = document.getElementById('tabla-mascotas-admin');
+      if (!tb) return;
       const todas = [...baseMascotas, ...baseAdopcionesPublicas];
       const filtradas = adminRole === 'superadmin' ? todas : todas.filter(m => m.refugio === adminInfo.org);
 
@@ -718,6 +953,7 @@
 
     function renderizarListaVoluntarios() {
       const ul = document.getElementById('lista-voluntarios-activos');
+      if (!ul) return;
       ul.innerHTML = (adminInfo.voluntarios || []).map(v => `
         <li class="bg-white p-3 border rounded-lg font-bold text-slate-700 flex justify-between">
           <span><i data-lucide="user" class="w-4 h-4 inline mr-2 text-slate-400"></i>${v}</span>
@@ -727,6 +963,7 @@
 
     function renderizarAdminLista() {
       const c = document.getElementById('lista-admins-activos');
+      if (!c) return;
       c.innerHTML = baseAdmins.map(a => `
         <div class="flex justify-between items-center p-4 border rounded-xl bg-white mb-2">
           <div>
@@ -740,20 +977,78 @@
     }
 
     // ==============================================
+    // COMPRESIÓN DE FOTOGRAFÍAS A BASE64
+    // ==============================================
+    async function comprimirArchivo(file) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (e) => {
+          const img = new Image();
+          img.src = e.target.result;
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 500; 
+            const scale = MAX_WIDTH / img.width;
+            canvas.width = MAX_WIDTH;
+            canvas.height = img.height * scale;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL('image/jpeg', 0.65)); // Compresión óptima al 65% para no saturar Firestore
+          };
+        };
+      });
+    }
+
+    //    window.procesarFotoEspecifica = async function(input, previewId, placeholderId, tipoDoc) {
+      if (input.files && input.files[0]) {
+        try {
+          const base64 = await comprimirArchivo(input.files[0]);
+          
+          if (tipoDoc === 'adoptante') fotoAdoptanteBase64 = base64;
+          if (tipoDoc === 'cedula') fotoCedulaBase64 = base64;
+          if (tipoDoc === 'riff') fotoRiffBase64 = base64;
+
+          const previewEl = document.getElementById(previewId);
+          const placeholderEl = document.getElementById(placeholderId);
+          
+          if (previewEl && placeholderEl) {
+            previewEl.src = base64;
+            previewEl.classList.remove('hidden');
+            placeholderEl.classList.add('hidden');
+          }
+        } catch (error) {
+          console.error("Error al comprimir archivo de documento:", error);
+          window.mostrarAlertaCustom("Error", "No se pudo procesar la imagen seleccionada.", "error");
+        }
+      }
+    };
+
+    // ==============================================
     // FUNCIONES GLOBALES ASIGNADAS A WINDOW
     // ==============================================
     window.cambiarVista = function(vista) {
-      ['vista-catalogo', 'vista-formulario', 'vista-admin', 'vista-exito', 'vista-dar-adopcion'].forEach(v => document.getElementById(v).classList.add('hidden'));
-      ['nav-catalogo', 'nav-dar-adopcion', 'nav-admin'].forEach(n => document.getElementById(n).classList.remove('font-bold', 'underline'));
+      ['vista-catalogo', 'vista-formulario', 'vista-admin', 'vista-exito', 'vista-dar-adopcion'].forEach(v => {
+        const el = document.getElementById(v);
+        if (el) el.classList.add('hidden');
+      });
+      ['nav-catalogo', 'nav-dar-adopcion', 'nav-admin'].forEach(n => {
+        const el = document.getElementById(n);
+        if (el) el.classList.remove('font-bold', 'underline', 'bg-orange-700');
+      });
 
-      document.getElementById(`vista-${vista}`).classList.remove('hidden');
-      if(document.getElementById(`nav-${vista}`)) document.getElementById(`nav-${vista}`).classList.add('font-bold', 'underline');
+      const vistaEl = document.getElementById(`vista-${vista}`);
+      if (vistaEl) vistaEl.classList.remove('hidden');
+      
+      const navEl = document.getElementById(`nav-${vista}`);
+      if(navEl) navEl.classList.add('font-bold', 'underline', 'bg-orange-700');
       window.scrollTo(0,0);
     };
 
     window.actualizarCiudades = function() {
       const est = document.getElementById('f_estado').value;
       const selectCiu = document.getElementById('f_ciudad');
+      if (!selectCiu) return;
       selectCiu.innerHTML = '';
       if(VENEZUELA[est]) VENEZUELA[est].forEach(ciu => selectCiu.add(new Option(ciu, ciu)));
     };
@@ -761,19 +1056,28 @@
     window.actualizarCiudadesPublicas = function() {
       const est = document.getElementById('p_estado_vzla').value;
       const selectCiu = document.getElementById('p_ciudad_vzla');
+      if (!selectCiu) return;
       selectCiu.innerHTML = '';
       if(VENEZUELA[est]) VENEZUELA[est].forEach(ciu => selectCiu.add(new Option(ciu, ciu)));
     };
 
-    window.toggleArrendamiento = () => document.getElementById('bloque_arrendamiento').classList.toggle('hidden', document.getElementById('f_estadoCasa').value === 'Propia');
-    window.togglePareja = () => document.getElementById('bloque_pareja').classList.toggle('hidden', !['Casado(a)', 'Concubinato', 'Noviazgo'].includes(document.getElementById('f_estadoCivil').value));
+    window.toggleArrendamiento = () => {
+      const bArr = document.getElementById('bloque_arrendamiento');
+      if (bArr) bArr.classList.toggle('hidden', document.getElementById('f_estadoCasa').value === 'Propia');
+    };
+    window.togglePareja = () => {
+      const bPar = document.getElementById('bloque_pareja');
+      if (bPar) bPar.classList.toggle('hidden', !['Casado(a)', 'Concubinato', 'Noviazgo'].includes(document.getElementById('f_estadoCivil').value));
+    };
     window.toggleInput = (sId, iId, vTrig = 'Si') => {
       const i = document.getElementById(iId);
+      if(!i) return;
       if(document.getElementById(sId).value === vTrig) { i.classList.remove('hidden'); i.required = true; } else { i.classList.add('hidden'); i.required = false; }
     };
 
     window.previsualizarFotosAdopcion = function(input) {
       const container = document.getElementById('p_fotos_preview');
+      if (!container) return;
       container.innerHTML = '';
       fotosAdopcionNueva = [];
 
@@ -829,24 +1133,11 @@
         fotosAdopcionNueva = [];
         window.cambiarVista('exito');
       } catch (err) {
-        alert("Error publicando.");
+        window.mostrarAlertaCustom("Error", "Ocurrió un error al intentar publicar.", "error");
         console.error(err);
       }
       document.getElementById('btn-publicar-adopcion').innerText = "Publicar Mascota";
       document.getElementById('btn-publicar-adopcion').disabled = false;
-    };
-
-    window.cargarFotoAdoptante = function(input) {
-      if (input.files && input.files[0]) {
-        const r = new FileReader();
-        r.onload = e => {
-          fotoAdoptanteBase64 = e.target.result;
-          document.getElementById('f_foto_preview').src = fotoAdoptanteBase64;
-          document.getElementById('f_foto_preview').classList.remove('hidden');
-          document.getElementById('f_foto_placeholder').classList.add('hidden');
-        }
-        r.readAsDataURL(input.files[0]);
-      }
     };
 
     window.prepararFormulario = function(id, source) {
@@ -864,18 +1155,47 @@
       
       document.getElementById('f_refugio').value = mascotaSeleccionada.refugio || (source === 'publicas' ? 'Adopción Particular' : 'Rescate General');
       
+      // Reiniciar fotos cargadas anteriormente en el formulario de adopción
+      fotoAdoptanteBase64 = '';
+      fotoCedulaBase64 = '';
+      fotoRiffBase64 = '';
+      ['f_foto_preview', 'f_cedula_preview', 'f_riff_preview'].forEach(pId => {
+        const el = document.getElementById(pId);
+        if (el) { el.src = ''; el.classList.add('hidden'); }
+      });
+      ['f_foto_placeholder', 'f_cedula_placeholder', 'f_riff_placeholder'].forEach(plId => {
+        const el = document.getElementById(plId);
+        if (el) el.classList.remove('hidden');
+      });
+
       window.cambiarVista('formulario');
     };
 
-    window.enviarSolicitudAdopcion = async function(e) {
+    //    window.enviarSolicitudAdopcion = async function(e) {
       e.preventDefault();
       const firma = document.getElementById('f_firma').value.trim().toLowerCase();
       const nComp = `${document.getElementById('f_nombres').value} ${document.getElementById('f_apellidos').value}`.trim().toLowerCase();
       
-      if (firma !== nComp) return alert("La firma final debe coincidir exactamente con sus Nombres y Apellidos.");
+      if (firma !== nComp) {
+        return window.mostrarAlertaCustom("Error de Firma", "La firma digital debe coincidir exactamente con sus Nombres y Apellidos escritos en la planilla.", "error");
+      }
+
+      if (!fotoAdoptanteBase64 || !fotoCedulaBase64 || !fotoRiffBase64) {
+        return window.mostrarAlertaCustom("Faltan Documentos", "Por favor cargue todas las fotografías requeridas: Foto personal (Selfie), Foto de Cédula y Foto del RIF.", "error");
+      }
 
       document.getElementById('btn-enviar-form').innerText = "PROCESANDO...";
       document.getElementById('btn-enviar-form').disabled = true;
+
+      // Obtener comodidades seleccionadas de los checkbox
+      const comodidadesSeleccionadas = [];
+      const comodidades = ['Visitas al Veterinario', 'Vacunas y Vitaminas', 'Paseos Diarios', 'Collar Identificación', 'Agua Fresca', 'Alimento propio', 'Desparasitación', 'Baño Semanal', 'Área Limpia'];
+      comodidades.forEach((_, idx) => {
+        const cb = document.getElementById(`c_comodidad_${idx}`);
+        if (cb && cb.checked) {
+          comodidadesSeleccionadas.push(comodidades[idx]);
+        }
+      });
 
       const solicitud = {
         mascotaId: mascotaSeleccionada?.id,
@@ -886,20 +1206,136 @@
         estadoSolicitud: 'Pendiente',
         refugioVinculado: mascotaSeleccionada?.refugio || 'General',
         userId: user.uid,
-        adoptante: nComp,
+        
+        // Datos Personales
+        adoptante: `${document.getElementById('f_nombres').value} ${document.getElementById('f_apellidos').value}`.trim(),
+        nombres: document.getElementById('f_nombres').value,
+        apellidos: document.getElementById('f_apellidos').value,
         cedula: document.getElementById('f_identificacion').value,
-        telefono: document.getElementById('f_tel1').value
+        estado: document.getElementById('f_estado').value,
+        ciudad: document.getElementById('f_ciudad').value,
+        direccion: document.getElementById('f_direccion').value,
+        estadoCasa: document.getElementById('f_estadoCasa').value,
+        estadoCivil: document.getElementById('f_estadoCivil').value,
+        telefono: document.getElementById('f_tel1').value,
+        telefonoSecundario: document.getElementById('f_tel2').value,
+        parejaNombre: document.getElementById('f_parejaNombre').value || '',
+        parejaTel: document.getElementById('f_parejaTel').value || '',
+
+        // Archivos en Base64 cargados
+        fotoAdoptante: fotoAdoptanteBase64,
+        fotoCedula: fotoCedulaBase64,
+        fotoRiff: fotoRiffBase64,
+
+        // Respuestas Entrevista
+        q1: document.getElementById('q1').value,
+        q2: document.getElementById('q2').value,
+        q2_extra: document.getElementById('q2_extra').value || '',
+        q4: document.getElementById('q4').value,
+        q5: document.getElementById('q5').value,
+        q6: document.getElementById('q6').value,
+        q6_extra: document.getElementById('q6_extra').value || '',
+        q9: document.getElementById('q9').value || '',
+        q9_extra: document.getElementById('q9_extra').value || '',
+        q10: document.getElementById('q10').value,
+        q15: document.getElementById('q15').value,
+        q17: document.getElementById('q17').value,
+        q20: document.getElementById('q20').value,
+        
+        // Compromisos
+        comodidades: comodidadesSeleccionadas,
+        compromisoEsterilizacion: document.getElementById('q24').value,
+        compromisoEsterilizacion_extra: document.getElementById('q24_extra').value || '',
+        
+        // Firma
+        firma: document.getElementById('f_firma').value
       };
 
       try {
         await addDoc(collection(db, ...PATH_BASE, 'solicitudes'), solicitud);
         e.target.reset();
-        document.getElementById('f_foto_preview').classList.add('hidden');
-        document.getElementById('f_foto_placeholder').classList.remove('hidden');
         window.cambiarVista('exito');
-      } catch (error) { alert("Error al guardar."); }
+      } catch (error) { 
+        window.mostrarAlertaCustom("Error de Guardado", "No se pudo transmitir la planilla.", "error"); 
+      }
       document.getElementById('btn-enviar-form').innerText = "ENVIAR SOLICITUD DEFINITIVA";
       document.getElementById('btn-enviar-form').disabled = false;
+    };
+
+    //    window.abrirDetalleSolicitud = function(id) {
+      const s = baseSolicitudes.find(item => item.id === id);
+      if (!s) return;
+
+      // Cargar información de Cabecera
+      document.getElementById('print-solicitud-id').innerText = s.numeroUnico;
+      document.getElementById('print-solicitud-fecha').innerText = new Date(s.fecha).toLocaleDateString('es-VE', { hour: '2-digit', minute: '2-digit' });
+
+      // Cargar Imágenes con fallbacks seguros
+      document.getElementById('print-foto-adoptante').src = s.fotoAdoptante || 'https://placehold.co/300x400/e2e8f0/94a3b8?text=Sin+Foto';
+      document.getElementById('print-foto-cedula').src = s.fotoCedula || 'https://placehold.co/400x250/e2e8f0/94a3b8?text=Sin+Cedula';
+      document.getElementById('print-foto-riff').src = s.fotoRiff || 'https://placehold.co/400x250/e2e8f0/94a3b8?text=Sin+RIF';
+
+      // Cargar Datos Personales
+      document.getElementById('print-nombres-completos').innerText = s.adoptante;
+      document.getElementById('print-cedula-id').innerText = s.cedula || 'No especificada';
+      document.getElementById('print-ubicacion').innerText = `${s.ciudad}, Edo. ${s.estado}`;
+      document.getElementById('print-direccion').innerText = s.direccion;
+      document.getElementById('print-telefono').innerText = s.telefono;
+      document.getElementById('print-telefono-secundario').innerText = s.telefonoSecundario || 'Ninguno';
+      document.getElementById('print-vivienda').innerText = s.estadoCasa;
+      document.getElementById('print-estado-civil').innerText = s.estadoCivil;
+
+      // Pareja
+      const pWrapper = document.getElementById('print-pareja-wrapper');
+      if (['Casado(a)', 'Concubinato', 'Noviazgo'].includes(s.estadoCivil) && s.parejaNombre) {
+        pWrapper.classList.remove('hidden');
+        document.getElementById('print-pareja-detalles').innerText = `${s.parejaNombre} (Teléfono: ${s.parejaTel})`;
+      } else {
+        pWrapper.classList.add('hidden');
+      }
+
+      // Cargar Entrevista
+      document.getElementById('print-q1').innerText = `"${s.q1}"`;
+      document.getElementById('print-q2').innerText = s.q2 === 'Si' ? `Sí (${s.q2_extra})` : 'No';
+      document.getElementById('print-q4').innerText = s.q4;
+      document.getElementById('print-q5').innerText = s.q5;
+      document.getElementById('print-q6').innerText = s.q6 === 'No' ? `No (${s.q6_extra})` : 'Sí';
+
+      // Alquiler
+      const aWrapper = document.getElementById('print-arrendador-wrapper');
+      if (s.estadoCasa === 'Arrendamiento' && s.q9) {
+        aWrapper.classList.remove('hidden');
+        document.getElementById('print-arrendador-info').innerText = `¿Permite mascotas?: ${s.q9} / Datos arrendador: ${s.q9_extra || 'Ninguno'}`;
+      } else {
+        aWrapper.classList.add('hidden');
+      }
+
+      document.getElementById('print-q10').innerText = `"${s.q10}"`;
+      document.getElementById('print-q15').innerText = s.q15;
+      document.getElementById('print-q17').innerText = `${s.q17} Hora(s)`;
+      document.getElementById('print-q20').innerText = s.q20;
+
+      // Cargar comodidades seleccionadas en forma de tags
+      const comodidadesContainer = document.getElementById('print-comodidades-tags');
+      comodidadesContainer.innerHTML = '';
+      if (s.comodidades && s.comodidades.length > 0) {
+        s.comodidades.forEach(com => {
+          comodidadesContainer.innerHTML += `<span class="bg-slate-100 border text-slate-800 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase">${com}</span>`;
+        });
+      } else {
+        comodidadesContainer.innerHTML = '<span class="text-slate-400 italic text-xs">Ninguna seleccionada</span>';
+      }
+
+      document.getElementById('print-q24').innerText = s.compromisoEsterilizacion === 'No' ? `No (${s.compromisoEsterilizacion_extra})` : 'Sí';
+      document.getElementById('print-firma').innerText = s.firma || s.adoptante;
+
+      // Mostrar el modal detallado
+      document.getElementById('modal-detalle-solicitud-container').classList.remove('hidden');
+      lucide.createIcons();
+    };
+
+    window.cerrarDetalleSolicitud = function() {
+      document.getElementById('modal-detalle-solicitud-container').classList.add('hidden');
     };
 
     window.intentarLoginAdmin = function() {
@@ -915,7 +1351,7 @@
           adminInfo = found;
           entrarAdmin();
         } else {
-          alert("Credenciales incorrectas.");
+          window.mostrarAlertaCustom("Contraseña Incorrecta", "La contraseña de acceso administrativo no es válida.", "error");
         }
       }
     };
@@ -928,20 +1364,31 @@
 
     window.cambiarTabAdmin = function(tab) {
       ['solicitudes', 'mascotas', 'config', 'voluntarios'].forEach(t => {
-        if(document.getElementById(`tab-${t}`)) document.getElementById(`tab-${t}`).classList.add('hidden');
-        if(document.getElementById(`tab-btn-${t}`)) document.getElementById(`tab-btn-${t}`).classList.replace('bg-orange-600', 'bg-slate-800');
+        const pane = document.getElementById(`tab-${t}`);
+        if(pane) pane.classList.add('hidden');
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if(btn) btn.classList.replace('bg-orange-600', 'bg-slate-800');
       });
-      document.getElementById(`tab-${tab}`).classList.remove('hidden');
-      document.getElementById(`tab-btn-${tab}`).classList.replace('bg-slate-800', 'bg-orange-600');
+      const actPane = document.getElementById(`tab-${tab}`);
+      if (actPane) actPane.classList.remove('hidden');
+      const actBtn = document.getElementById(`tab-btn-${tab}`);
+      if (actBtn) actBtn.classList.replace('bg-slate-800', 'bg-orange-600');
     };
 
     window.actEstadoSol = async function(id, estado) {
-      try { await updateDoc(doc(db, ...PATH_BASE, 'solicitudes', id), { estadoSolicitud: estado }); } catch (e) { alert("Error"); }
+      try { 
+        await updateDoc(doc(db, ...PATH_BASE, 'solicitudes', id), { estadoSolicitud: estado }); 
+        window.mostrarAlertaCustom("Estado Sincronizado", `La solicitud fue catalogada como: ${estado}`, "success");
+      } catch (e) { 
+        window.mostrarAlertaCustom("Error", "No se pudo actualizar la solicitud.", "error"); 
+      }
     };
 
     window.abrirModalEdicion = function(id, source) {
       const modal = document.getElementById('modal-mascota');
+      if (!modal) return;
       const formResps = document.getElementById('e_responsable');
+      if (!formResps) return;
       
       formResps.innerHTML = '<option value="">Sin asignar</option>';
       if(adminInfo && adminInfo.voluntarios) {
@@ -952,8 +1399,14 @@
         document.getElementById('modal-mascota-titulo').innerText = "Añadir Mascota Interna";
         document.getElementById('e_mascota_id').value = '';
         document.getElementById('e_mascota_source').value = 'pets';
-        ['e_nombre', 'e_especie', 'e_raza', 'e_sexo', 'e_zona', 'e_responsable'].forEach(id => document.getElementById(id).value = '');
-        ['e_vacunado', 'e_esterilizado', 'e_desparasitado'].forEach(id => document.getElementById(id).checked = false);
+        ['e_nombre', 'e_especie', 'e_raza', 'e_sexo', 'e_zona', 'e_responsable'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.value = '';
+        });
+        ['e_vacunado', 'e_esterilizado', 'e_desparasitado'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.checked = false;
+        });
       } else {
         document.getElementById('modal-mascota-titulo').innerText = "Editar Mascota";
         const listado = source === 'publicas' ? baseAdopcionesPublicas : baseMascotas;
@@ -1005,7 +1458,10 @@
           await addDoc(collection(db, ...PATH_BASE, colName), payload);
         }
         window.cerrarModalEdicion();
-      } catch (err) { alert("Error guardando datos."); console.error(err); }
+      } catch (err) { 
+        window.mostrarAlertaCustom("Error de Guardado", "No se pudo actualizar la información de la mascota.", "error"); 
+        console.error(err); 
+      }
     };
 
     window.agregarVoluntario = async function() {
@@ -1020,7 +1476,9 @@
         adminInfo.voluntarios = actualizados;
         document.getElementById('new_voluntario_nombre').value = '';
         renderizarListaVoluntarios();
-      } catch (e) { alert("Error"); }
+      } catch (e) { 
+        window.mostrarAlertaCustom("Error", "No se pudo registrar al voluntario.", "error"); 
+      }
     };
 
     window.crearNuevoAdmin = async function(e) {
@@ -1034,13 +1492,49 @@
           voluntarios: []
         });
         e.target.reset();
-      } catch (e) { alert("Error creando admin"); }
+        window.mostrarAlertaCustom("Perfil Guardado", "Se registró la cuenta administrativa exitosamente.", "success");
+      } catch (e) { 
+        window.mostrarAlertaCustom("Error", "No se pudo estructurar el perfil.", "error"); 
+      }
     };
 
     window.borrarAdmin = async function(id) {
       if(confirm("¿Borrar permanentemente?")) {
         try { await deleteDoc(doc(db, ...PATH_BASE, 'admins', id)); } catch(e) {}
       }
+    };
+
+    // ==============================================
+    // MANEJO DE ALERTAS PERSONALIZADAS (iFrame Safe)
+    // ==============================================
+    window.mostrarAlertaCustom = function(titulo, mensaje, tipo = 'info') {
+      const modal = document.getElementById('modal-alerta-custom');
+      const iconBox = document.getElementById('alerta-custom-icono');
+      const titleEl = document.getElementById('alerta-custom-titulo');
+      const messageEl = document.getElementById('alerta-custom-mensaje');
+
+      if (!modal) return;
+
+      titleEl.innerText = titulo;
+      messageEl.innerText = mensaje;
+
+      if (tipo === 'success') {
+        iconBox.className = "w-16 h-16 mx-auto flex items-center justify-center rounded-full bg-emerald-100 text-emerald-600";
+        iconBox.innerHTML = '<i data-lucide="check" class="w-8 h-8"></i>';
+      } else if (tipo === 'error') {
+        iconBox.className = "w-16 h-16 mx-auto flex items-center justify-center rounded-full bg-red-100 text-red-600";
+        iconBox.innerHTML = '<i data-lucide="alert-triangle" class="w-8 h-8"></i>';
+      } else {
+        iconBox.className = "w-16 h-16 mx-auto flex items-center justify-center rounded-full bg-orange-100 text-orange-600";
+        iconBox.innerHTML = '<i data-lucide="info" class="w-8 h-8"></i>';
+      }
+
+      modal.classList.remove('hidden');
+      lucide.createIcons();
+    };
+
+    window.cerrarAlertaCustom = function() {
+      document.getElementById('modal-alerta-custom').classList.add('hidden');
     };
 
     // ==============================================
